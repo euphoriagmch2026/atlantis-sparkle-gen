@@ -19,13 +19,6 @@ const categories: EventCategory[] = [
     color: 'primary',
   },
   {
-    icon: <Code className="w-10 h-10" />,
-    title: 'Technical',
-    description: 'Hackathons, coding challenges, and innovation showcases.',
-    eventCount: 12,
-    color: 'accent',
-  },
-  {
     icon: <Gamepad2 className="w-10 h-10" />,
     title: 'Gaming',
     description: 'Esports tournaments, casual gaming, and VR experiences.',
