@@ -79,7 +79,7 @@ export const EventsPreviewSection = () => {
         </div>
 
         {/* Categories grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
           {categories.map((category, index) => {
             const colorClasses = getColorClasses(category.color);
             return (
