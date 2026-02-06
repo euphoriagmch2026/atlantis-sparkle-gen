@@ -25,7 +25,7 @@ export const HeroSection = () => {
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         {/* Pre-title */}
         <p className="text-primary/80 text-sm md:text-base tracking-[0.3em] uppercase mb-4 animate-fade-in opacity-0" style={{ animationDelay: '0.2s' }}>
-          The Annual College Fest
+          GOVERNMENT MEDICAL COLLEGE AND HOSPITAL, CHANDIGARH
         </p>
         
         {/* Main title */}
@@ -42,7 +42,7 @@ export const HeroSection = () => {
         
         {/* Tagline */}
         <p className="font-raleway text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-12 animate-fade-in opacity-0" style={{ animationDelay: '0.8s' }}>
-          Rise of the <span className="text-primary text-glow">Lost City</span>
+          Lost City of <span className="text-primary text-glow">Atlantis</span>
         </p>
         
         {/* CTA Buttons */}
