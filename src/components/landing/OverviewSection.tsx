@@ -81,7 +81,7 @@ export const OverviewSection = () => {
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-8">
           {stats.map((stat, index) => (
             <div 
               key={stat.label}
