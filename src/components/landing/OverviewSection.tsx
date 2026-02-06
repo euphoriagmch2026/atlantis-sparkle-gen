@@ -10,9 +10,9 @@ interface StatItem {
 
 const stats: StatItem[] = [
   { icon: <Sparkles className="w-8 h-8" />, value: 50, suffix: '+', label: 'Events' },
-  { icon: <Users className="w-8 h-8" />, value: 10000, suffix: '+', label: 'Attendees' },
-  { icon: <Calendar className="w-8 h-8" />, value: 3, suffix: '', label: 'Days' },
-  { icon: <Trophy className="w-8 h-8" />, value: 5, suffix: 'L+', label: 'Prize Pool' },
+  { icon: <Users className="w-8 h-8" />, value: 4000, suffix: '+', label: 'Attendees' },
+  { icon: <Calendar className="w-8 h-8" />, value: 4, suffix: '', label: 'Days' },
+  { icon: <Memories className="w-8 h-8" />, value: 5, suffix: 'K+', label: 'Core Memories' },
 ];
 
 const AnimatedCounter = ({ target, suffix, inView }: { target: number; suffix: string; inView: boolean }) => {
