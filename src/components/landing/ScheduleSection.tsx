@@ -17,7 +17,7 @@ interface DaySchedule {
 const schedule: DaySchedule[] = [
   {
     day: 'Day 1',
-    date: 'April 30, 2026',
+    date: 'March 15, 2026',
     theme: 'The Awakening',
     events: [
       { time: '10:00 AM', title: 'Opening Ceremony', description: 'Grand inauguration with special guests' },
@@ -28,7 +28,7 @@ const schedule: DaySchedule[] = [
   },
   {
     day: 'Day 2',
-    date: 'May 1, 2026',
+    date: 'March 16, 2026',
     theme: 'The Rising',
     events: [
       { time: '09:00 AM', title: 'Hackathon Kickoff', description: '24-hour coding challenge begins' },
@@ -39,7 +39,7 @@ const schedule: DaySchedule[] = [
   },
   {
     day: 'Day 3',
-    date: 'May 2, 2026',
+    date: 'March 17, 2026',
     theme: 'The Triumph',
     events: [
       { time: '10:00 AM', title: 'Hackathon Finals', description: 'Project presentations' },
@@ -48,16 +48,6 @@ const schedule: DaySchedule[] = [
       { time: '07:00 PM', title: 'Closing Night', description: 'Grand finale celebration' },
     ],
   },
-  {
-    day: 'Day 4',
-    date: 'May 3, 2026',
-    theme: 'The Triumph',
-    events: [
-      { time: '10:00 AM', title: 'Hackathon Finals', description: 'Project presentations' },
-      { time: '01:00 PM', title: 'Gaming Finals', description: 'Championship matches' },
-      { time: '04:00 PM', title: 'Award Ceremony', description: 'Prize distribution' },
-      { time: '07:00 PM', title: 'Closing Night', description: 'Grand finale celebration' },
-    ],
 ];
 
 export const ScheduleSection = () => {

@@ -1,32 +1,21 @@
 import { Instagram, Twitter, Youtube, Mail, MapPin, Phone } from 'lucide-react';
+
 export const Footer = () => {
-  const socialLinks = [{
-    icon: <Instagram className="w-5 h-5" />,
-    href: '#',
-    label: 'Instagram'
-  }, {
-    icon: <Twitter className="w-5 h-5" />,
-    href: '#',
-    label: 'Twitter'
-  }, {
-    icon: <Youtube className="w-5 h-5" />,
-    href: '#',
-    label: 'YouTube'
-  }];
-  const quickLinks = [{
-    label: 'Events',
-    href: '#events'
-  }, {
-    label: 'Schedule',
-    href: '#schedule'
-  }, {
-    label: 'Passes',
-    href: '#passes'
-  }, {
-    label: 'Register',
-    href: '#register'
-  }];
-  return <footer className="relative pt-16 pb-8 px-4 border-t border-border/50">
+  const socialLinks = [
+    { icon: <Instagram className="w-5 h-5" />, href: '#', label: 'Instagram' },
+    { icon: <Twitter className="w-5 h-5" />, href: '#', label: 'Twitter' },
+    { icon: <Youtube className="w-5 h-5" />, href: '#', label: 'YouTube' },
+  ];
+
+  const quickLinks = [
+    { label: 'Events', href: '#events' },
+    { label: 'Schedule', href: '#schedule' },
+    { label: 'Passes', href: '#passes' },
+    { label: 'Register', href: '#register' },
+  ];
+
+  return (
+    <footer className="relative pt-16 pb-8 px-4 border-t border-border/50">
       {/* Decorative top glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
@@ -42,9 +31,16 @@ export const Footer = () => {
               EUPHORIA 2026 awaits you in the Lost City of Atlantis.
             </p>
             <div className="flex gap-4">
-              {socialLinks.map(link => <a key={link.label} href={link.href} aria-label={link.label} className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  aria-label={link.label}
+                  className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.3)]"
+                >
                   {link.icon}
-                </a>)}
+                </a>
+              ))}
             </div>
           </div>
 
@@ -54,11 +50,16 @@ export const Footer = () => {
               Quick Links
             </h4>
             <ul className="space-y-2">
-              {quickLinks.map(link => <li key={link.label}>
-                  <a href={link.href} className="text-muted-foreground hover:text-primary transition-colors">
+              {quickLinks.map((link) => (
+                <li key={link.label}>
+                  <a 
+                    href={link.href}
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
                     {link.label}
                   </a>
-                </li>)}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -70,7 +71,8 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-muted-foreground">
                 <MapPin className="w-4 h-4 mt-1 text-primary" />
-                <span className="text-sm">Government Medical College and Hospital, Chandigarh<br />
+                <span className="text-sm">
+                  College Name<br />
                   City, State - 000000
                 </span>
               </li>
@@ -101,5 +103,6 @@ export const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };
