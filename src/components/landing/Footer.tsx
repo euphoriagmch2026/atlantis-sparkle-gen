@@ -2,9 +2,7 @@ import { Instagram, Twitter, Youtube, Mail, MapPin, Phone } from 'lucide-react';
 
 export const Footer = () => {
   const socialLinks = [
-    { icon: <Instagram className="w-5 h-5" />, href: '#', label: 'Instagram' },
-    { icon: <Twitter className="w-5 h-5" />, href: '#', label: 'Twitter' },
-    { icon: <Youtube className="w-5 h-5" />, href: '#', label: 'YouTube' },
+    { icon: <Instagram className="w-5 h-5" />, href: 'https://www.instagram.com/euphoriachandigarh', label: 'Instagram' }
   ];
 
   const quickLinks = [
@@ -72,20 +70,20 @@ export const Footer = () => {
               <li className="flex items-start gap-3 text-muted-foreground">
                 <MapPin className="w-4 h-4 mt-1 text-primary" />
                 <span className="text-sm">
-                  College Name<br />
-                  City, State - 000000
+                  Government Medical College and Hospital<br />
+                  Chandigarh - 160030
                 </span>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href="mailto:euphoria@college.edu" className="text-sm hover:text-primary transition-colors">
-                  euphoria@college.edu
+                <a href="mailto:euphoriagmch2026@gmail.com" className="text-sm hover:text-primary transition-colors">
+                  euphoriagmch2026@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Phone className="w-4 h-4 text-primary" />
-                <a href="tel:+910000000000" className="text-sm hover:text-primary transition-colors">
-                  +91 00000 00000
+                <a href="tel:+919256039360" className="text-sm hover:text-primary transition-colors">
+                  +91 92560 39360
                 </a>
               </li>
             </ul>
