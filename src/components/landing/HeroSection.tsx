@@ -47,7 +47,7 @@ PRESENTS</p>
         {/* Tagline */}
         <p className="font-raleway text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-12 animate-fade-in opacity-0" style={{
         animationDelay: '0.8s'
-      }}>Lost City of Atlantis<span className="text-primary text-glow">Lost City</span>
+      }}>Lost City<span className="text-primary text-glow">Lost City</span>
         </p>
         
         {/* CTA Buttons */}
