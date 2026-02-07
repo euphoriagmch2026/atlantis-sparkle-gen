@@ -23,7 +23,7 @@ const placeholderEvents: Event[] = [
     name: 'Event Name',
     category: 'cultural',
     day: 1,
-    teamSize: '2-4 members',
+    teamSize: 'Duet',
     duration: '3 hours',
     fee: 200,
     prizePool: '₹15,000',
@@ -31,28 +31,6 @@ const placeholderEvents: Event[] = [
   },
   {
     id: '3',
-    name: 'Event Name',
-    category: 'technical',
-    day: 1,
-    teamSize: 'Solo',
-    duration: '4 hours',
-    fee: 150,
-    prizePool: '₹20,000',
-    description: 'Event description goes here. Add details about the event, rules, and what participants can expect.',
-  },
-  {
-    id: '4',
-    name: 'Event Name',
-    category: 'technical',
-    day: 2,
-    teamSize: '2-3 members',
-    duration: '6 hours',
-    fee: 300,
-    prizePool: '₹50,000',
-    description: 'Event description goes here. Add details about the event, rules, and what participants can expect.',
-  },
-  {
-    id: '5',
     name: 'Event Name',
     category: 'gaming',
     day: 2,
@@ -63,7 +41,7 @@ const placeholderEvents: Event[] = [
     description: 'Event description goes here. Add details about the event, rules, and what participants can expect.',
   },
   {
-    id: '6',
+    id: '4',
     name: 'Event Name',
     category: 'gaming',
     day: 2,
@@ -74,7 +52,7 @@ const placeholderEvents: Event[] = [
     description: 'Event description goes here. Add details about the event, rules, and what participants can expect.',
   },
   {
-    id: '7',
+    id: '5',
     name: 'Event Name',
     category: 'workshop',
     day: 3,
@@ -85,11 +63,11 @@ const placeholderEvents: Event[] = [
     description: 'Event description goes here. Add details about the event, rules, and what participants can expect.',
   },
   {
-    id: '8',
+    id: '6',
     name: 'Event Name',
     category: 'workshop',
     day: 3,
-    teamSize: 'Solo',
+    teamSize: 'Duet',
     duration: '3 hours',
     fee: 200,
     prizePool: 'Certificate',
@@ -116,9 +94,13 @@ const Events = () => {
       
       // Team type filter
       if (selectedTeamType !== 'all') {
-        const isSolo = event.teamSize.toLowerCase().includes('solo');
+        const teamSizeLower = event.teamSize.toLowerCase();
+        const isSolo = teamSizeLower.includes('solo');
+        const isDuet = teamSizeLower.includes('duet');
+        
         if (selectedTeamType === 'solo' && !isSolo) return false;
-        if (selectedTeamType === 'team' && isSolo) return false;
+        if (selectedTeamType === 'duet' && !isDuet) return false;
+        if (selectedTeamType === 'team' && (isSolo || isDuet)) return false;
       }
       
       return true;
