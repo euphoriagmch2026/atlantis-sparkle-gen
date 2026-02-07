@@ -1,6 +1,7 @@
 import { Music, Code, Gamepad2, Palette } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface EventCategory {
   icon: React.ReactNode;
@@ -114,8 +115,9 @@ export const EventsPreviewSection = () => {
           <Button 
             variant="outline" 
             className="border-primary/50 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-300"
+            asChild
           >
-            View All Events
+            <Link to="/events">View All Events</Link>
           </Button>
         </div>
       </div>

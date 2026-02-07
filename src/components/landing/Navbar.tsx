@@ -4,11 +4,11 @@ import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { label: 'Home', href: '#' },
-  { label: 'Events', href: '#events' },
-  { label: 'Schedule', href: '#schedule' },
-  { label: 'Passes', href: '#passes' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/' },
+  { label: 'Events', href: '/events' },
+  { label: 'Schedule', href: '/#schedule' },
+  { label: 'Passes', href: '/#passes' },
+  { label: 'Contact', href: '/#contact' },
 ];
 
 export const Navbar = () => {
