@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 export interface Event {
   id: string;
   name: string;
-  category: 'cultural' | 'technical' | 'gaming' | 'workshop';
+  category: 'cultural' | 'gaming' | 'workshop';
   day: 1 | 2 | 3;
   teamSize: string;
   duration: string;
@@ -23,7 +23,6 @@ interface EventCardProps {
 
 const categoryColors = {
   cultural: 'primary',
-  technical: 'accent',
   gaming: 'coral',
   workshop: 'mystic',
 } as const;
@@ -58,7 +57,6 @@ export const EventCard = ({ event, onRegister }: EventCardProps) => {
           "absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium tracking-wider uppercase",
           "bg-background/80 backdrop-blur-sm border",
           colorKey === 'primary' && "border-primary/50 text-primary",
-          colorKey === 'accent' && "border-accent/50 text-accent",
           colorKey === 'coral' && "border-coral/50 text-coral",
           colorKey === 'mystic' && "border-mystic/50 text-mystic",
         )}>

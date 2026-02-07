@@ -13,7 +13,6 @@ interface EventFiltersProps {
 const categories = [
   { id: 'all', label: 'All Events' },
   { id: 'cultural', label: 'Cultural' },
-  { id: 'technical', label: 'Technical' },
   { id: 'gaming', label: 'Gaming' },
   { id: 'workshop', label: 'Workshops' },
 ];
@@ -28,6 +27,7 @@ const days = [
 const teamTypes = [
   { id: 'all', label: 'All' },
   { id: 'solo', label: 'Solo' },
+  { id: 'duet', label: 'Duet' },
   { id: 'team', label: 'Team' },
 ];
 
