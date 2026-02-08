@@ -52,7 +52,15 @@ export const Navbar = () => {
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="font-cinzel text-xl font-bold text-foreground text-glow">
+        <Link 
+          to="/" 
+          className="flex items-center gap-3 font-cinzel text-xl font-bold text-foreground text-glow"
+        >
+          <img 
+            src="/NavbarLogo.jpg" 
+            alt="Euphoria Logo" 
+            className="h-10 w-10 rounded-full object-cover border-2 border-primary/20" 
+          />
           EUPHORIA
         </Link>
 
