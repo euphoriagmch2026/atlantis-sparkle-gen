@@ -1,19 +1,24 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { CartItem, Pass } from '@/types/passes';
+import { CartItem, Pass, PassCartItem, EventCartItem } from '@/types/passes';
+import { Event } from '@/components/events/EventCard';
 
 interface CartContextType {
   cartItems: CartItem[];
   totalAmount: number;
   totalItems: number;
-  addToCart: (pass: Pass, quantity?: number) => void;
-  removeFromCart: (passId: string) => void;
-  updateQuantity: (passId: string, quantity: number) => void;
+  passItems: PassCartItem[];
+  eventItems: EventCartItem[];
+  addPassToCart: (pass: Pass, quantity?: number) => void;
+  addEventToCart: (event: Event, quantity?: number) => void;
+  removeFromCart: (itemId: string, type: 'pass' | 'event') => void;
+  updateQuantity: (itemId: string, type: 'pass' | 'event', quantity: number) => void;
   clearCart: () => void;
+  isInCart: (itemId: string, type: 'pass' | 'event') => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'euphoria-cart';
+const STORAGE_KEY = 'euphoria-cart-v2';
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -27,6 +32,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
+  const passItems = cartItems.filter((item): item is PassCartItem => item.type === 'pass');
+  const eventItems = cartItems.filter((item): item is EventCartItem => item.type === 'event');
+
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -34,41 +42,64 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const addToCart = useCallback((pass: Pass, quantity = 1) => {
+  const addPassToCart = useCallback((pass: Pass, quantity = 1) => {
     setCartItems((prev) => {
-      const existing = prev.find((item) => item.passId === pass.id);
+      const existing = prev.find((item) => item.id === pass.id && item.type === 'pass');
       if (existing) {
         return prev.map((item) =>
-          item.passId === pass.id
+          item.id === pass.id && item.type === 'pass'
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [
-        ...prev,
-        {
-          passId: pass.id,
-          passName: pass.name,
-          price: pass.price,
-          quantity,
-          tier: pass.tier,
-        },
-      ];
+      const newItem: PassCartItem = {
+        id: pass.id,
+        name: pass.name,
+        price: pass.price,
+        quantity,
+        type: 'pass',
+        tier: pass.tier,
+      };
+      return [...prev, newItem];
     });
   }, []);
 
-  const removeFromCart = useCallback((passId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.passId !== passId));
+  const addEventToCart = useCallback((event: Event, quantity = 1) => {
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === event.id && item.type === 'event');
+      if (existing) {
+        return prev.map((item) =>
+          item.id === event.id && item.type === 'event'
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+      const newItem: EventCartItem = {
+        id: event.id,
+        name: event.name,
+        price: event.fee,
+        quantity,
+        type: 'event',
+        category: event.category,
+        day: event.day,
+        teamSize: event.teamSize,
+      };
+      return [...prev, newItem];
+    });
   }, []);
 
-  const updateQuantity = useCallback((passId: string, quantity: number) => {
+  const removeFromCart = useCallback((itemId: string, type: 'pass' | 'event') => {
+    setCartItems((prev) => prev.filter((item) => !(item.id === itemId && item.type === type)));
+  }, []);
+
+  const updateQuantity = useCallback((itemId: string, type: 'pass' | 'event', quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(passId);
+      removeFromCart(itemId, type);
       return;
     }
     setCartItems((prev) =>
       prev.map((item) =>
-        item.passId === passId ? { ...item, quantity } : item
+        item.id === itemId && item.type === type ? { ...item, quantity } : item
       )
     );
   }, [removeFromCart]);
@@ -77,16 +108,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCartItems([]);
   }, []);
 
+  const isInCart = useCallback((itemId: string, type: 'pass' | 'event') => {
+    return cartItems.some((item) => item.id === itemId && item.type === type);
+  }, [cartItems]);
+
   return (
     <CartContext.Provider
       value={{
         cartItems,
         totalAmount,
         totalItems,
-        addToCart,
+        passItems,
+        eventItems,
+        addPassToCart,
+        addEventToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+        isInCart,
       }}
     >
       {children}

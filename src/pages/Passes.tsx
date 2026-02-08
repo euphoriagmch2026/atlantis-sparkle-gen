@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/Footer';
 import { FloatingParticles } from '@/components/landing/FloatingParticles';
 import { PassCard } from '@/components/passes/PassCard';
 import { CartSummary } from '@/components/passes/CartSummary';
-import { CartProvider, useCart } from '@/contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import { PASSES } from '@/types/passes';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, X } from 'lucide-react';
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
-const PassesContent = () => {
+const Passes = () => {
   const { totalItems } = useCart();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -101,14 +101,6 @@ const PassesContent = () => {
 
       <Footer />
     </div>
-  );
-};
-
-const Passes = () => {
-  return (
-    <CartProvider>
-      <PassesContent />
-    </CartProvider>
   );
 };
 

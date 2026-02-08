@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { Check, Minus, Plus, ShoppingCart, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Pass, PassTier } from '@/types/passes';
 import { useCart } from '@/contexts/CartContext';
@@ -11,22 +11,12 @@ interface PassCardProps {
 }
 
 const tierStyles: Record<PassTier, { border: string; glow: string; badge: string }> = {
-  general: {
+  basic: {
     border: 'border-primary/50',
     glow: 'hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)]',
     badge: 'border-primary/50 text-primary',
   },
-  day: {
-    border: 'border-mystic/50',
-    glow: 'hover:shadow-[0_0_40px_hsl(var(--mystic-purple)/0.3)]',
-    badge: 'border-mystic/50 text-mystic',
-  },
-  proshow: {
-    border: 'border-coral/50',
-    glow: 'hover:shadow-[0_0_40px_hsl(var(--coral)/0.3)]',
-    badge: 'border-coral/50 text-coral',
-  },
-  vip: {
+  earlybird: {
     border: 'border-accent/50',
     glow: 'hover:shadow-[0_0_40px_hsl(var(--accent)/0.3)]',
     badge: 'border-accent/50 text-accent',
@@ -34,19 +24,18 @@ const tierStyles: Record<PassTier, { border: string; glow: string; badge: string
 };
 
 const tierLabels: Record<PassTier, string> = {
-  general: 'Popular',
-  day: 'Flexible',
-  proshow: 'Premium',
-  vip: 'Exclusive',
+  basic: 'Essential',
+  earlybird: 'Best Value',
 };
 
 export const PassCard = ({ pass }: PassCardProps) => {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const { addPassToCart, isInCart } = useCart();
   const styles = tierStyles[pass.tier];
+  const inCart = isInCart(pass.id, 'pass');
 
   const handleAddToCart = () => {
-    addToCart(pass, quantity);
+    addPassToCart(pass, quantity);
     setQuantity(1);
   };
 
@@ -128,11 +117,25 @@ export const PassCard = ({ pass }: PassCardProps) => {
 
         {/* Add to cart button */}
         <Button
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+          className={cn(
+            "w-full gap-2",
+            inCart 
+              ? "bg-accent hover:bg-accent/90 text-accent-foreground" 
+              : "bg-primary hover:bg-primary/90 text-primary-foreground"
+          )}
           onClick={handleAddToCart}
         >
-          <ShoppingCart className="w-4 h-4" />
-          Add to Cart
+          {inCart ? (
+            <>
+              <CheckCircle className="w-4 h-4" />
+              Add More
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4" />
+              Add to Cart
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

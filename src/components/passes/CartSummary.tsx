@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Trash2, ShoppingBag, Minus, Plus } from 'lucide-react';
+import { Trash2, ShoppingBag, Minus, Plus, Ticket, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/CartContext';
 import { PassTier } from '@/types/passes';
@@ -9,15 +9,19 @@ interface CartSummaryProps {
   onCheckout?: () => void;
 }
 
-const tierColors: Record<PassTier, string> = {
-  general: 'text-primary',
-  day: 'text-mystic',
-  proshow: 'text-coral',
-  vip: 'text-accent',
+const passTierColors: Record<PassTier, string> = {
+  basic: 'text-primary',
+  earlybird: 'text-accent',
+};
+
+const eventCategoryColors: Record<string, string> = {
+  cultural: 'text-primary',
+  gaming: 'text-coral',
+  workshop: 'text-mystic',
 };
 
 export const CartSummary = ({ className, onCheckout }: CartSummaryProps) => {
-  const { cartItems, totalAmount, totalItems, removeFromCart, updateQuantity } = useCart();
+  const { cartItems, totalAmount, totalItems, passItems, eventItems, removeFromCart, updateQuantity } = useCart();
 
   if (cartItems.length === 0) {
     return (
@@ -28,12 +32,15 @@ export const CartSummary = ({ className, onCheckout }: CartSummaryProps) => {
             Your treasure chest is empty
           </h3>
           <p className="text-sm text-muted-foreground">
-            Add some passes to begin your journey
+            Add some passes or events to begin your journey
           </p>
         </div>
       </div>
     );
   }
+
+  const passSubtotal = passItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const eventSubtotal = eventItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className={cn('glass-card rounded-xl border border-border/50 overflow-hidden', className)}>
@@ -49,58 +56,134 @@ export const CartSummary = ({ className, onCheckout }: CartSummaryProps) => {
       </div>
 
       {/* Cart items */}
-      <div className="p-4 space-y-4 max-h-[300px] overflow-y-auto">
-        {cartItems.map((item) => (
-          <div
-            key={item.passId}
-            className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20 border border-border/30"
-          >
-            <div className="flex-1 min-w-0">
-              <h4 className={cn('font-medium text-sm truncate', tierColors[item.tier])}>
-                {item.passName}
-              </h4>
-              <p className="text-xs text-muted-foreground mt-1">
-                ₹{item.price} × {item.quantity}
-              </p>
+      <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
+        {/* Passes Section */}
+        {passItems.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Ticket className="w-4 h-4 text-accent" />
+              <span className="text-sm font-medium text-foreground">Passes</span>
+              <span className="text-xs text-muted-foreground ml-auto">₹{passSubtotal}</span>
             </div>
+            <div className="space-y-2">
+              {passItems.map((item) => (
+                <div
+                  key={`pass-${item.id}`}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20 border border-border/30"
+                >
+                  <div className="flex-1 min-w-0">
+                    <h4 className={cn('font-medium text-sm truncate', passTierColors[item.tier])}>
+                      {item.name}
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      ₹{item.price} × {item.quantity}
+                    </p>
+                  </div>
 
-            {/* Quantity controls */}
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => updateQuantity(item.passId, item.quantity - 1)}
-              >
-                <Minus className="w-3 h-3" />
-              </Button>
-              <span className="w-6 text-center text-sm">{item.quantity}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => updateQuantity(item.passId, item.quantity + 1)}
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-            </div>
+                  {/* Quantity controls */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => updateQuantity(item.id, 'pass', item.quantity - 1)}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <span className="w-6 text-center text-sm">{item.quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => updateQuantity(item.id, 'pass', item.quantity + 1)}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
 
-            {/* Item total and remove */}
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-sm font-medium text-foreground">
-                ₹{item.price * item.quantity}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-destructive hover:text-destructive"
-                onClick={() => removeFromCart(item.passId)}
-              >
-                <Trash2 className="w-3 h-3" />
-              </Button>
+                  {/* Item total and remove */}
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-sm font-medium text-foreground">
+                      ₹{item.price * item.quantity}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-destructive hover:text-destructive"
+                      onClick={() => removeFromCart(item.id, 'pass')}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
+        )}
+
+        {/* Events Section */}
+        {eventItems.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Calendar className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">Events</span>
+              <span className="text-xs text-muted-foreground ml-auto">₹{eventSubtotal}</span>
+            </div>
+            <div className="space-y-2">
+              {eventItems.map((item) => (
+                <div
+                  key={`event-${item.id}`}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20 border border-border/30"
+                >
+                  <div className="flex-1 min-w-0">
+                    <h4 className={cn('font-medium text-sm truncate', eventCategoryColors[item.category])}>
+                      {item.name}
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Day {item.day} • {item.teamSize} • ₹{item.price}
+                    </p>
+                  </div>
+
+                  {/* Quantity controls */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => updateQuantity(item.id, 'event', item.quantity - 1)}
+                    >
+                      <Minus className="w-3 h-3" />
+                    </Button>
+                    <span className="w-6 text-center text-sm">{item.quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => updateQuantity(item.id, 'event', item.quantity + 1)}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </Button>
+                  </div>
+
+                  {/* Item total and remove */}
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-sm font-medium text-foreground">
+                      ₹{item.price * item.quantity}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-destructive hover:text-destructive"
+                      onClick={() => removeFromCart(item.id, 'event')}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer with total and checkout */}
