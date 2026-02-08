@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCart } from '@/contexts/CartContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -14,6 +16,8 @@ const navLinks = [
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { totalItems } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +27,19 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleNavClick = (href: string) => {
+    setIsMobileMenuOpen(false);
+    if (href.startsWith('/#')) {
+      // Handle hash links
+      const hash = href.substring(1);
+      if (window.location.pathname === '/') {
+        document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        navigate('/' + hash);
+      }
+    }
+  };
 
   return (
     <nav
@@ -35,37 +52,85 @@ export const Navbar = () => {
     >
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="font-cinzel text-xl font-bold text-foreground text-glow">
+        <Link to="/" className="font-cinzel text-xl font-bold text-foreground text-glow">
           EUPHORIA
-        </a>
+        </Link>
 
         {/* Desktop navigation */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-muted-foreground hover:text-primary transition-colors text-sm tracking-wide"
-            >
-              {link.label}
-            </a>
+            link.href.startsWith('/#') ? (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(link.href);
+                }}
+                className="text-muted-foreground hover:text-primary transition-colors text-sm tracking-wide"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="text-muted-foreground hover:text-primary transition-colors text-sm tracking-wide"
+              >
+                {link.label}
+              </Link>
+            )
           ))}
+          
+          {/* Cart icon */}
+          <Link to="/passes" className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative text-muted-foreground hover:text-primary"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center animate-pulse">
+                  {totalItems}
+                </span>
+              )}
+            </Button>
+          </Link>
+
           <Button 
             size="sm"
             className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            onClick={() => navigate('/passes')}
           >
             Register
           </Button>
         </div>
 
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden text-foreground"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile menu button and cart */}
+        <div className="flex items-center gap-2 md:hidden">
+          <Link to="/passes" className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative text-foreground"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Button>
+          </Link>
+          <button
+            className="text-foreground"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -77,16 +142,36 @@ export const Navbar = () => {
       >
         <div className="px-4 py-6 flex flex-col gap-4">
           {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-muted-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.label}
-            </a>
+            link.href.startsWith('/#') ? (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-muted-foreground hover:text-primary transition-colors py-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(link.href);
+                }}
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="text-muted-foreground hover:text-primary transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            )
           ))}
-          <Button className="w-full mt-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button 
+            className="w-full mt-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              navigate('/passes');
+            }}
+          >
             Register
           </Button>
         </div>

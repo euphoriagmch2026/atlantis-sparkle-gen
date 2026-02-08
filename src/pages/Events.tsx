@@ -107,11 +107,6 @@ const Events = () => {
     });
   }, [selectedCategory, selectedDay, selectedTeamType]);
 
-  const handleRegister = (eventId: string) => {
-    // TODO: Implement registration flow
-    console.log('Register for event:', eventId);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -169,7 +164,6 @@ const Events = () => {
                     <EventCard 
                       key={event.id} 
                       event={event} 
-                      onRegister={handleRegister}
                     />
                   ))}
                 </div>

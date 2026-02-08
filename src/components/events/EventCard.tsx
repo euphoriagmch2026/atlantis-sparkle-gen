@@ -1,7 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Clock, Trophy, IndianRupee } from 'lucide-react';
+import { Users, Clock, Trophy, IndianRupee, ShoppingCart, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCart } from '@/contexts/CartContext';
 
 export interface Event {
   id: string;
@@ -18,7 +19,6 @@ export interface Event {
 
 interface EventCardProps {
   event: Event;
-  onRegister?: (eventId: string) => void;
 }
 
 const categoryColors = {
@@ -27,8 +27,14 @@ const categoryColors = {
   workshop: 'mystic',
 } as const;
 
-export const EventCard = ({ event, onRegister }: EventCardProps) => {
+export const EventCard = ({ event }: EventCardProps) => {
   const colorKey = categoryColors[event.category];
+  const { addEventToCart, isInCart } = useCart();
+  const inCart = isInCart(event.id, 'event');
+
+  const handleAddToCart = () => {
+    addEventToCart(event);
+  };
   
   return (
     <Card className={cn(
@@ -99,10 +105,25 @@ export const EventCard = ({ event, onRegister }: EventCardProps) => {
         </div>
         
         <Button 
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-          onClick={() => onRegister?.(event.id)}
+          className={cn(
+            "w-full gap-2",
+            inCart 
+              ? "bg-accent hover:bg-accent/90 text-accent-foreground" 
+              : "bg-primary hover:bg-primary/90 text-primary-foreground"
+          )}
+          onClick={handleAddToCart}
         >
-          Register Now
+          {inCart ? (
+            <>
+              <CheckCircle className="w-4 h-4" />
+              Added to Cart
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4" />
+              Add to Cart
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

@@ -1,4 +1,27 @@
-export type PassTier = 'general' | 'day' | 'proshow' | 'vip';
+export type PassTier = 'basic' | 'earlybird';
+export type ItemType = 'pass' | 'event';
+
+export interface CartItemBase {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  type: ItemType;
+}
+
+export interface PassCartItem extends CartItemBase {
+  type: 'pass';
+  tier: PassTier;
+}
+
+export interface EventCartItem extends CartItemBase {
+  type: 'event';
+  category: 'cultural' | 'gaming' | 'workshop';
+  day: 1 | 2 | 3;
+  teamSize: string;
+}
+
+export type CartItem = PassCartItem | EventCartItem;
 
 export interface Pass {
   id: string;
@@ -9,66 +32,33 @@ export interface Pass {
   tier: PassTier;
 }
 
-export interface CartItem {
-  passId: string;
-  passName: string;
-  price: number;
-  quantity: number;
-  tier: PassTier;
-}
-
 export const PASSES: Pass[] = [
   {
-    id: 'general-fest',
-    name: 'General Fest Pass',
-    description: 'Experience the full magic of EUPHORIA 2026 with access to all cultural events and activities.',
-    price: 499,
+    id: 'basic-registration',
+    name: 'Basic Registration (BR)',
+    description: 'Get access to the fest grounds and experience the magic of EUPHORIA 2026.',
+    price: 299,
     benefits: [
-      'Access to all cultural events',
-      'Gaming zone entry',
-      'Food court access',
-      'Event merchandise discounts',
+      'Entry to fest grounds',
+      'Access to food court',
+      'View cultural performances',
+      'Participate in open events',
     ],
-    tier: 'general',
+    tier: 'basic',
   },
   {
-    id: 'day-pass',
-    name: 'Day Pass',
-    description: 'Perfect for a single day of underwater adventures and memorable experiences.',
-    price: 199,
+    id: 'early-bird-all-night',
+    name: 'Early Bird All Night Pass',
+    description: 'The ultimate night experience with exclusive access to pro shows and after-parties.',
+    price: 999,
     benefits: [
-      'Single day access',
-      'Select cultural events',
-      'Food court access',
-    ],
-    tier: 'day',
-  },
-  {
-    id: 'proshow-pass',
-    name: 'Pro Show Pass',
-    description: 'Get the ultimate concert experience with premium seating and exclusive backstage access.',
-    price: 1499,
-    benefits: [
-      'VIP seating at pro shows',
-      'Meet & greet access',
-      'Exclusive merchandise',
-      'Priority entry to all events',
-    ],
-    tier: 'proshow',
-  },
-  {
-    id: 'vip-pass',
-    name: 'VIP Pass',
-    description: 'The ultimate EUPHORIA experience with all-access privileges and exclusive perks.',
-    price: 2999,
-    benefits: [
-      'All-access pass to every event',
-      'Priority entry everywhere',
-      'Exclusive VIP lounge access',
-      'Premium goodies bag',
+      'All Basic Registration benefits',
+      'Priority entry to pro shows',
+      'Access to all night events',
+      'Exclusive after-party access',
+      'Early bird discount pricing',
       'Complimentary refreshments',
-      'Personal concierge service',
     ],
-    tier: 'vip',
+    tier: 'earlybird',
   },
 ];
