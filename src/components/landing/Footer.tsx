@@ -74,16 +74,25 @@ export const Footer = () => {
               <li className="flex items-start gap-3 text-muted-foreground">
                 <MapPin className="w-4 h-4 mt-1 text-primary" />
                 <a
-                  href="https://maps.app.goo.gl/ZGwG2tBfMtRasNxs8"
+                  // href="https://maps.app.goo.gl/4t9PiZqfSbxQWvNGA"
                   className="text-sm"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  // target="_blank"
+                  // rel="noopener noreferrer"
                 >
                   Government Medical College & Hospital
                   <br />
                   Chandigarh - 160030
                 </a>
               </li>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.354713557967!2d76.77751667503661!3d30.708426986807783!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fed84b6130e0d%3A0xa2c57cf6132d4839!2sGMCH%20Academic%20Block%20E!5e0!3m2!1sen!2sin!4v1770656475732!5m2!1sen!2sin"
+                width="200"
+                height="200"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
                 <a
