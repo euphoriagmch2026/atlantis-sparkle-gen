@@ -1,15 +1,19 @@
-import { Instagram, Twitter, Youtube, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Mail, MapPin, Phone } from "lucide-react";
 
 export const Footer = () => {
   const socialLinks = [
-    { icon: <Instagram className="w-5 h-5" />, href: 'https://www.instagram.com/euphoriachandigarh', label: 'Instagram' }
+    {
+      icon: <Instagram className="w-5 h-5" />,
+      href: "https://www.instagram.com/euphoriachandigarh",
+      label: "Instagram",
+    },
   ];
 
   const quickLinks = [
-    { label: 'Events', href: '#events' },
-    { label: 'Schedule', href: '#schedule' },
-    { label: 'Passes', href: '#passes' },
-    { label: 'Register', href: '#register' },
+    { label: "Events", href: "/events" },
+    { label: "Schedule", href: "#schedule" },
+    { label: "Passes", href: "/passes" },
+    { label: "Register", href: "#register" },
   ];
 
   return (
@@ -25,7 +29,7 @@ export const Footer = () => {
               EUPHORIA
             </h3>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Rise from the depths of the ordinary into the extraordinary. 
+              Rise from the depths of the ordinary into the extraordinary.
               EUPHORIA 2026 awaits you in the Lost City of Atlantis.
             </p>
             <div className="flex gap-4">
@@ -50,7 +54,7 @@ export const Footer = () => {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <a 
+                  <a
                     href={link.href}
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
@@ -69,20 +73,32 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-muted-foreground">
                 <MapPin className="w-4 h-4 mt-1 text-primary" />
-                <span className="text-sm">
-                  Government Medical College and Hospital<br />
+                <a
+                  href="https://maps.app.goo.gl/ZGwG2tBfMtRasNxs8"
+                  className="text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Government Medical College & Hospital
+                  <br />
                   Chandigarh - 160030
-                </span>
+                </a>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href="mailto:euphoriagmch2026@gmail.com" className="text-sm hover:text-primary transition-colors">
+                <a
+                  href="mailto:euphoriagmch2026@gmail.com"
+                  className="text-sm hover:text-primary transition-colors"
+                >
                   euphoriagmch2026@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Phone className="w-4 h-4 text-primary" />
-                <a href="tel:+919256039360" className="text-sm hover:text-primary transition-colors">
+                <a
+                  href="tel:+919256039360"
+                  className="text-sm hover:text-primary transition-colors"
+                >
                   +91 92560 39360
                 </a>
               </li>
@@ -97,7 +113,9 @@ export const Footer = () => {
           </p>
           <p className="text-muted-foreground/60 text-xs flex items-center gap-2">
             <span>Designed for</span>
-            <span className="text-accent">EUPHORIA – Lost City of Atlantis</span>
+            <span className="text-accent">
+              EUPHORIA – Lost City of Atlantis
+            </span>
           </p>
         </div>
       </div>
