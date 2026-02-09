@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Trash2, ShoppingBag, Minus, Plus, Ticket, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -6,7 +7,6 @@ import { PassTier } from '@/types/passes';
 
 interface CartSummaryProps {
   className?: string;
-  onCheckout?: () => void;
 }
 
 const passTierColors: Record<PassTier, string> = {
@@ -20,8 +20,13 @@ const eventCategoryColors: Record<string, string> = {
   workshop: 'text-mystic',
 };
 
-export const CartSummary = ({ className, onCheckout }: CartSummaryProps) => {
+export const CartSummary = ({ className }: CartSummaryProps) => {
+  const navigate = useNavigate();
   const { cartItems, totalAmount, totalItems, passItems, eventItems, removeFromCart, updateQuantity } = useCart();
+
+  const handleCheckout = () => {
+    navigate('/checkout');
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -197,7 +202,8 @@ export const CartSummary = ({ className, onCheckout }: CartSummaryProps) => {
 
         <Button
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-          onClick={onCheckout}
+          onClick={handleCheckout}
+          disabled={cartItems.length === 0}
         >
           Proceed to Checkout
         </Button>
