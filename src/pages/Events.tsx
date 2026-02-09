@@ -1,9 +1,13 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingCart } from 'lucide-react';
 import { Navbar } from '@/components/landing/Navbar';
 import { Footer } from '@/components/landing/Footer';
 import { EventCard, Event } from '@/components/events/EventCard';
 import { EventFilters } from '@/components/events/EventFilters';
 import { FloatingParticles } from '@/components/landing/FloatingParticles';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/contexts/CartContext';
 
 // Placeholder events - empty structure ready for content
 const placeholderEvents: Event[] = [
@@ -76,6 +80,8 @@ const placeholderEvents: Event[] = [
 ];
 
 const Events = () => {
+  const navigate = useNavigate();
+  const { totalItems, totalAmount } = useCart();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedTeamType, setSelectedTeamType] = useState('all');
@@ -179,6 +185,20 @@ const Events = () => {
           </div>
         </div>
       </main>
+
+      {/* Floating Checkout Button - Show when cart has items */}
+      {totalItems > 0 && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <Button
+            onClick={() => navigate('/checkout')}
+            size="lg"
+            className="h-14 px-6 rounded-full shadow-lg bg-accent hover:bg-accent/90 text-accent-foreground animate-pulse-glow"
+          >
+            <ShoppingCart className="w-5 h-5 mr-2" />
+            Checkout (₹{totalAmount})
+          </Button>
+        </div>
+      )}
 
       <Footer />
     </div>
