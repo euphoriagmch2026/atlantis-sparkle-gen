@@ -1,148 +1,192 @@
 
-# Phase 4: Passes & Tickets System
+
+# Phase 5: Checkout & Payment Flow
 
 ## Summary
-Building a complete passes and ticketing system with pass type cards, shopping cart functionality, and checkout flow - all styled with the Atlantis underwater theme to match the existing design.
+Building a complete checkout experience with a user details form, order summary, and Razorpay payment integration. The checkout will collect participant information and process payments for both event registrations and passes.
 
 ---
 
 ## New Files to Create
 
-### 1. Pass Type Definitions
-**File:** `src/types/passes.ts`
+### 1. Checkout Page
+**File:** `src/pages/Checkout.tsx`
 
-Define TypeScript interfaces for the passes system:
-- `Pass` interface with id, name, description, price, benefits array, tier/color theme
-- `CartItem` interface for tracking selected passes with quantity
-- Four pass tiers: General Fest Pass, Day Pass, Pro Show Pass, VIP Pass
+Full checkout page with two main sections:
 
----
+**Left Section - User Details Form:**
+- Name (required)
+- Email (required, validated)
+- Phone number (required, 10 digits)
+- College/Organization (required)
+- For team events: ability to add team member names
 
-### 2. Cart Context (State Management)
-**File:** `src/contexts/CartContext.tsx`
+**Right Section - Order Summary:**
+- Reuse CartSummary component in read-only mode
+- Shows all cart items grouped by type
+- Grand total prominently displayed
+- "Pay Now" button to initiate Razorpay
 
-React Context provider for managing cart state across the application:
-- `addToCart(pass, quantity)` - Add a pass to cart
-- `removeFromCart(passId)` - Remove item from cart
-- `updateQuantity(passId, quantity)` - Update item quantity
-- `clearCart()` - Empty the cart
-- `cartItems` array and `totalAmount` computed value
-- Automatic persistence to localStorage
-
----
-
-### 3. Pass Card Component
-**File:** `src/components/passes/PassCard.tsx`
-
-Individual pass display card matching the existing EventCard styling:
-- Tier-specific border colors (teal for General, gold for VIP, coral for Pro Show, mystic for Day)
-- Glowing border effects on hover using the existing `glass-card` pattern
-- Pass name with Cinzel font and glow effects
-- Price prominently displayed with gold accent
-- Benefits list with checkmark icons
-- Quantity selector (+/- buttons with current count)
-- "Add to Cart" button with hover effects
-- Smooth hover scale animation: `hover:scale-[1.02]`
+**Layout:**
+- Two-column on desktop (form left, summary right)
+- Single column stacked on mobile
+- FloatingParticles background for theme consistency
+- Redirect to /passes if cart is empty
 
 ---
 
-### 4. Cart Summary Component
-**File:** `src/components/passes/CartSummary.tsx`
+### 2. Checkout Form Component
+**File:** `src/components/checkout/CheckoutForm.tsx`
 
-Cart panel for viewing selected items:
-- List of added items with quantities and prices
-- Individual item totals
-- Remove item buttons (trash icon)
-- Grand total with gold text glow styling
-- "Proceed to Checkout" CTA button styled as primary
-- Empty cart state with themed message ("Your treasure chest is empty")
-- Will be used as sidebar on desktop and drawer on mobile
+React Hook Form powered form with Zod validation:
+- Input fields styled with the glass-card aesthetic
+- Real-time validation feedback
+- Error states with themed styling
+- Loading state during payment processing
+
+**Form Fields:**
+| Field | Type | Validation |
+|-------|------|------------|
+| Full Name | text | Required, min 2 chars |
+| Email | email | Required, valid email format |
+| Phone | tel | Required, 10 digits |
+| College | text | Required |
+| Team Members | array | Optional, only for team events |
 
 ---
 
-### 5. Passes Page
-**File:** `src/pages/Passes.tsx`
+### 3. Order Summary Component
+**File:** `src/components/checkout/OrderSummary.tsx`
 
-Full passes page layout following Events page structure:
-- Hero section with underwater theme and page title
-- Grid of 4 pass type cards (responsive: 1 column mobile, 2 tablet, 4 desktop)
-- Sticky cart summary sidebar on desktop (lg breakpoint and above)
-- Bottom drawer/sheet for cart on mobile using existing Drawer component
-- FloatingParticles background effect for consistency
-- Wrapped in CartProvider for state access
+Read-only version of cart summary for checkout:
+- No quantity modification controls
+- Clean list of all items with prices
+- Subtotals for passes and events
+- Grand total with gold glow styling
+- Secure payment badge/indicator
+
+---
+
+### 4. Razorpay Integration Hook
+**File:** `src/hooks/useRazorpay.ts`
+
+Custom hook for Razorpay payment flow:
+- Dynamically loads Razorpay script
+- `initiatePayment(amount, orderId, userDetails)` function
+- Handles success/failure callbacks
+- Returns payment status and loading state
+
+**Note:** Razorpay requires a backend to create orders. This will be prepared for Supabase Edge Function integration (to be set up separately).
+
+---
+
+### 5. Order Confirmation Page
+**File:** `src/pages/OrderConfirmation.tsx`
+
+Success page after payment:
+- Order ID display
+- Summary of purchased items
+- Email confirmation message
+- Animated success checkmark
+- "Back to Home" and "View Events" CTAs
 
 ---
 
 ## Files to Modify
 
 ### 1. App.tsx
-- Wrap the app with CartProvider
-- Add new route: `/passes` pointing to Passes page
+Add new routes:
+- `/checkout` - Checkout page
+- `/order-confirmation` - Success page
 
-### 2. Navbar.tsx
-- Update "Passes" link from `/#passes` to `/passes`
+### 2. CartSummary.tsx
+Wire up the `onCheckout` prop:
+- Navigate to `/checkout` when clicked
+- Disable button if cart is empty
 
----
+### 3. Passes.tsx
+Pass the checkout handler to CartSummary
 
-## Pass Types Structure
-
-| Pass | Tier Color | Benefits |
-|------|------------|----------|
-| **General Fest Pass** | Teal (primary) | Access to all cultural events, Gaming zone entry, Food court access |
-| **Day Pass** | Purple (mystic) | Single day access, Select events, Food court access |
-| **Pro Show Pass** | Coral | VIP seating at pro shows, Meet & greet access, Exclusive merchandise |
-| **VIP Pass** | Gold (accent) | All-access pass, Priority entry, Exclusive lounge, Goodies bag |
-
-Note: Prices will be placeholders (TBD) to be filled in later.
+### 4. Events.tsx
+Add a floating "Checkout" button when cart has items
 
 ---
 
 ## Technical Details
 
-### Cart State Shape
+### Form Validation Schema (Zod)
 ```text
-CartContext:
-  items: [
-    { 
-      passId: string, 
-      passName: string, 
-      price: number, 
-      quantity: number,
-      tier: string 
-    }
-  ]
-  addItem(pass, quantity)
-  removeItem(passId)
-  updateQuantity(passId, newQuantity)
-  clearCart()
-  totalAmount: number (computed)
-  totalItems: number (computed)
+checkoutSchema = z.object({
+  fullName: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().regex(/^[0-9]{10}$/, "Phone must be 10 digits"),
+  college: z.string().min(2, "College name is required"),
+  teamMembers: z.array(z.string()).optional()
+})
+```
+
+### Razorpay Integration Flow
+```text
+1. User fills form and clicks "Pay Now"
+2. Frontend validates form
+3. Call Supabase Edge Function to create Razorpay order
+4. Edge function returns order_id
+5. Open Razorpay checkout modal with order_id
+6. On success: Edge function verifies signature
+7. Store order in database
+8. Clear cart and redirect to confirmation
+```
+
+### Component Structure
+```text
+Checkout.tsx
+├── Navbar
+├── FloatingParticles
+├── Main Content (flex container)
+│   ├── CheckoutForm (left/top)
+│   │   ├── Form fields
+│   │   ├── Team members section (conditional)
+│   │   └── Pay Now button
+│   └── OrderSummary (right/bottom on mobile)
+│       ├── Items list (read-only)
+│       ├── Subtotals
+│       └── Grand total
+└── Footer
 ```
 
 ### Styling Approach
-Following existing patterns from EventCard:
-- Pass cards use `glass-card` class with tier-specific border colors
-- Hover effects with `hover:scale-[1.02]` and dynamic glow shadows
-- Price uses `text-glow-gold` for emphasis
-- Benefits list with Lucide Check icons in primary color
-- Quantity buttons styled as small circular buttons with border
+Following existing patterns:
+- Form inputs use `glass-card` backgrounds with primary border on focus
+- Labels use muted-foreground color
+- Error messages in destructive color
+- Pay button uses gold gradient for emphasis
+- Success page uses primary glow effects
 
 ### Responsive Design
-- **Mobile** (< 768px): Single column pass cards, bottom drawer for cart (uses Drawer component)
-- **Tablet** (768px - 1024px): 2-column grid, cart accessible via floating button
-- **Desktop** (> 1024px): 2x2 or 4-column grid, sticky sidebar cart (like Events page filters)
+- **Mobile**: Single column, form above order summary
+- **Tablet/Desktop**: Two-column layout with sticky order summary
 
-### localStorage Persistence
-Cart state automatically syncs to localStorage with key `euphoria-cart` so users don't lose their selection on page refresh.
+---
+
+## Edge Function Placeholder
+
+The checkout flow will prepare for a Supabase Edge Function that:
+- Creates Razorpay orders
+- Verifies payment signatures
+- Stores orders in database
+
+For now, the frontend will have the complete UI and Razorpay script loading, with the actual payment call ready to be connected once the edge function is set up.
 
 ---
 
 ## Implementation Order
 
-1. Create `src/types/passes.ts` with type definitions
-2. Create `src/contexts/CartContext.tsx` with state management
-3. Build `src/components/passes/PassCard.tsx` component
-4. Build `src/components/passes/CartSummary.tsx` component
-5. Create `src/pages/Passes.tsx` with full layout
-6. Update `src/App.tsx` with CartProvider and route
-7. Update `src/components/landing/Navbar.tsx` navigation link
+1. Create `src/components/checkout/CheckoutForm.tsx` with form validation
+2. Create `src/components/checkout/OrderSummary.tsx` for read-only cart display
+3. Create `src/hooks/useRazorpay.ts` for payment script loading
+4. Create `src/pages/Checkout.tsx` with full layout
+5. Create `src/pages/OrderConfirmation.tsx` for success state
+6. Update `src/App.tsx` with new routes
+7. Update `src/components/passes/CartSummary.tsx` to navigate to checkout
+8. Update `src/pages/Passes.tsx` and `src/pages/Events.tsx` with checkout navigation
+
