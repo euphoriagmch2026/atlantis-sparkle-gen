@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { FloatingParticles } from "@/components/landing/FloatingParticles";
@@ -7,20 +6,13 @@ import { CartSummary } from "@/components/passes/CartSummary";
 import { useCart } from "@/contexts/CartContext";
 import { PASSES } from "@/types/passes";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, X } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-  DrawerClose,
-} from "@/components/ui/drawer";
+import { ShoppingCart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Passes = () => {
   const { totalItems } = useCart();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -59,45 +51,24 @@ const Passes = () => {
         </div>
       </section>
 
+      {/* FIXED: No Drawer on mobile. Standard navigation prevents body lock */}
       <div className="fixed bottom-6 right-6 lg:hidden z-40">
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerTrigger asChild>
-            <Button
-              size="lg"
-              className={cn(
-                "h-14 w-14 rounded-full shadow-lg",
-                "bg-primary hover:bg-primary/90 text-primary-foreground",
-                "animate-pulse-glow relative",
-              )}
-            >
-              <ShoppingCart className="w-6 h-6" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center border-2 border-background">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
-          </DrawerTrigger>
-          <DrawerContent className="bg-background border-border/50 max-h-[85vh]">
-            <DrawerHeader className="flex items-center justify-between border-b border-border/20 px-4">
-              <DrawerTitle className="font-cinzel text-foreground">
-                Your Cart
-              </DrawerTitle>
-              <DrawerClose asChild>
-                <Button variant="ghost" size="icon">
-                  <X className="w-5 h-5" />
-                </Button>
-              </DrawerClose>
-            </DrawerHeader>
-            <div className="px-4 pb-8 overflow-y-auto">
-              {/* Added onCheckoutClick to ensure drawer closes and unlocks body scroll */}
-              <CartSummary
-                className="border-0 bg-transparent shadow-none"
-                onCheckoutClick={() => setIsDrawerOpen(false)}
-              />
-            </div>
-          </DrawerContent>
-        </Drawer>
+        <Button
+          size="lg"
+          onClick={() => navigate("/cart")}
+          className={cn(
+            "h-14 w-14 rounded-full shadow-lg",
+            "bg-primary hover:bg-primary/90 text-primary-foreground",
+            "animate-pulse-glow relative",
+          )}
+        >
+          <ShoppingCart className="w-6 h-6" />
+          {totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center border-2 border-background">
+              {totalItems}
+            </span>
+          )}
+        </Button>
       </div>
 
       <Footer />

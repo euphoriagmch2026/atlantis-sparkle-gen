@@ -21,9 +21,6 @@ const Checkout = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Ensure scroll is restored when component mounts (failsafe for scroll lock issues)
-    document.body.style.overflow = "unset";
-
     if (cartItems.length === 0) {
       navigate("/passes");
     }
@@ -72,33 +69,28 @@ const Checkout = () => {
     <div className="min-h-screen bg-background relative overflow-hidden">
       <FloatingParticles />
       <Navbar />
-      <main className="relative pt-24 md:pt-28 pb-16 md:pb-20 px-4">
+      <main className="relative pt-24 md:pt-28 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="mb-4 md:mb-6 text-muted-foreground hover:text-foreground"
+            className="mb-6 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Cart
           </Button>
-          <div className="text-center mb-8 md:mb-10">
+          <div className="text-center mb-10">
             <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-3 text-glow">
               Checkout
             </h1>
-            <p className="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
-              Complete your registration for EUPHORIA 2026. Fill in your details
-              below.
-            </p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Form Column: order-2 on mobile so summary is seen first */}
+            {/* Form stacks BELOW summary on mobile for better visibility */}
             <div className="lg:col-span-3 order-2 lg:order-1">
               <CheckoutForm onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
-            {/* Summary Column: order-1 on mobile */}
             <div className="lg:col-span-2 order-1 lg:order-2">
-              <div className="lg:sticky lg:top-28 mb-8 lg:mb-0">
+              <div className="lg:sticky lg:top-28">
                 <OrderSummary />
               </div>
             </div>
