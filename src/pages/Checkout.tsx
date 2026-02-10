@@ -17,7 +17,6 @@ const Checkout = () => {
   const { initiatePayment, isLoading } = useRazorpay();
   const { toast } = useToast();
 
-  // Redirect to passes if cart is empty
   useEffect(() => {
     if (cartItems.length === 0) {
       navigate('/passes');
@@ -25,33 +24,27 @@ const Checkout = () => {
   }, [cartItems.length, navigate]);
 
   const handleSubmit = async (data: CheckoutFormData & { teamMembers: string[] }) => {
-    // Prepare payment options
-    const paymentOptions = {
-      amount: totalAmount * 100, // Convert to paise
-      name: 'EUPHORIA 2026',
-      description: `Registration for ${cartItems.length} item(s)`,
-      prefill: {
-        name: data.fullName,
-        email: data.email,
-        contact: data.phone,
-      },
-      notes: {
-        college: data.college,
-        teamMembers: data.teamMembers.join(', '),
-      },
-    };
+    const cartItemsForOrder = cartItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      type: item.type,
+    }));
 
-    // Note: In production, you would first call your backend to create a Razorpay order
-    // and get the order_id before initiating payment
-    
-    const result = await initiatePayment(paymentOptions);
+    const result = await initiatePayment(cartItemsForOrder, {
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      college: data.college,
+      teamMembers: data.teamMembers,
+    });
 
     if (result.success) {
-      // Clear cart and navigate to confirmation
       clearCart();
       navigate('/order-confirmation', {
         state: {
-          orderId: result.razorpay_order_id || `EUPH-${Date.now()}`,
+          orderId: result.razorpay_order_id,
           paymentId: result.razorpay_payment_id,
           userDetails: data,
         },
@@ -65,19 +58,14 @@ const Checkout = () => {
     }
   };
 
-  // Show nothing while redirecting
-  if (cartItems.length === 0) {
-    return null;
-  }
+  if (cartItems.length === 0) return null;
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <FloatingParticles />
       <Navbar />
-
       <main className="relative pt-28 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Back Button */}
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -86,8 +74,6 @@ const Checkout = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Cart
           </Button>
-
-          {/* Page Header */}
           <div className="text-center mb-10">
             <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-3 text-glow">
               Checkout
@@ -96,15 +82,10 @@ const Checkout = () => {
               Complete your registration for EUPHORIA 2026. Fill in your details below.
             </p>
           </div>
-
-          {/* Two Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Left - Form (3 columns) */}
             <div className="lg:col-span-3">
               <CheckoutForm onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
-
-            {/* Right - Order Summary (2 columns) */}
             <div className="lg:col-span-2">
               <div className="lg:sticky lg:top-28">
                 <OrderSummary />
@@ -113,7 +94,6 @@ const Checkout = () => {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
