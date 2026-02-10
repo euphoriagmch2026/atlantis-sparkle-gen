@@ -27,7 +27,6 @@ const Passes = () => {
       <FloatingParticles />
       <Navbar />
 
-      {/* Hero Section: Scaled down for mobile screens */}
       <section className="relative pt-24 md:pt-32 pb-12 md:pb-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="font-cinzel text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 text-glow">
@@ -40,7 +39,6 @@ const Passes = () => {
         </div>
       </section>
 
-      {/* Main Content: Responsive grid columns */}
       <section className="relative pb-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">
@@ -52,7 +50,6 @@ const Passes = () => {
               </div>
             </div>
 
-            {/* Desktop Cart Sidebar */}
             <div className="hidden lg:block w-80 shrink-0">
               <div className="sticky top-24">
                 <CartSummary />
@@ -62,7 +59,6 @@ const Passes = () => {
         </div>
       </section>
 
-      {/* Mobile Cart Floating Button */}
       <div className="fixed bottom-6 right-6 lg:hidden z-40">
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerTrigger asChild>
@@ -94,7 +90,7 @@ const Passes = () => {
               </DrawerClose>
             </DrawerHeader>
             <div className="px-4 pb-8 overflow-y-auto">
-              {/* Force drawer closure on navigation to fix scrolling being stuck */}
+              {/* Added onCheckoutClick to ensure drawer closes and unlocks body scroll */}
               <CartSummary
                 className="border-0 bg-transparent shadow-none"
                 onCheckoutClick={() => setIsDrawerOpen(false)}

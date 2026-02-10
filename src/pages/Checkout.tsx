@@ -21,6 +21,9 @@ const Checkout = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Ensure scroll is restored when component mounts (failsafe for scroll lock issues)
+    document.body.style.overflow = "unset";
+
     if (cartItems.length === 0) {
       navigate("/passes");
     }
@@ -89,11 +92,13 @@ const Checkout = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* Form Column: order-2 on mobile so summary is seen first */}
             <div className="lg:col-span-3 order-2 lg:order-1">
               <CheckoutForm onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
+            {/* Summary Column: order-1 on mobile */}
             <div className="lg:col-span-2 order-1 lg:order-2">
-              <div className="lg:sticky lg:top-28">
+              <div className="lg:sticky lg:top-28 mb-8 lg:mb-0">
                 <OrderSummary />
               </div>
             </div>

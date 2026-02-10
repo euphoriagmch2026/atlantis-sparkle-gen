@@ -14,7 +14,7 @@ import { PassTier } from "@/types/passes";
 
 interface CartSummaryProps {
   className?: string;
-  onCheckoutClick?: () => void;
+  onCheckoutClick?: () => void; // Prop to handle drawer closure
 }
 
 const passTierColors: Record<PassTier, string> = {
@@ -44,7 +44,7 @@ export const CartSummary = ({
   } = useCart();
 
   const handleCheckout = () => {
-    if (onCheckoutClick) onCheckoutClick();
+    if (onCheckoutClick) onCheckoutClick(); // Close drawer before navigating
     navigate("/checkout");
   };
 
@@ -126,7 +126,6 @@ export const CartSummary = ({
                       ₹{item.price} × {item.quantity}
                     </p>
                   </div>
-
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
@@ -152,7 +151,6 @@ export const CartSummary = ({
                       <Plus className="w-3 h-3" />
                     </Button>
                   </div>
-
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-medium text-foreground">
                       ₹{item.price * item.quantity}
@@ -202,7 +200,6 @@ export const CartSummary = ({
                       Day {item.day} • {item.teamSize} • ₹{item.price}
                     </p>
                   </div>
-
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
@@ -228,7 +225,6 @@ export const CartSummary = ({
                       <Plus className="w-3 h-3" />
                     </Button>
                   </div>
-
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-medium text-foreground">
                       ₹{item.price * item.quantity}
