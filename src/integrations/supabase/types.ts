@@ -14,7 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      order_items: {
+        Row: {
+          id: string
+          item_id: string
+          item_name: string
+          item_type: string
+          metadata: Json | null
+          order_id: string
+          price: number
+          quantity: number
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          item_name: string
+          item_type: string
+          metadata?: Json | null
+          order_id: string
+          price: number
+          quantity?: number
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          item_name?: string
+          item_type?: string
+          metadata?: Json | null
+          order_id?: string
+          price?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          college: string
+          created_at: string
+          currency: string
+          email: string
+          full_name: string
+          id: string
+          phone: string
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          status: string
+          team_members: string[] | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          college: string
+          created_at?: string
+          currency?: string
+          email: string
+          full_name: string
+          id?: string
+          phone: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          status?: string
+          team_members?: string[] | null
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          college?: string
+          created_at?: string
+          currency?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          status?: string
+          team_members?: string[] | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
