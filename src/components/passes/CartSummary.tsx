@@ -1,36 +1,61 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Trash2, ShoppingBag, Minus, Plus, Ticket, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useCart } from '@/contexts/CartContext';
-import { PassTier } from '@/types/passes';
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import {
+  Trash2,
+  ShoppingBag,
+  Minus,
+  Plus,
+  Ticket,
+  Calendar,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useCart } from "@/contexts/CartContext";
+import { PassTier } from "@/types/passes";
 
 interface CartSummaryProps {
   className?: string;
+  onCheckoutClick?: () => void;
 }
 
 const passTierColors: Record<PassTier, string> = {
-  basic: 'text-primary',
-  earlybird: 'text-accent',
+  basic: "text-primary",
+  earlybird: "text-accent",
 };
 
 const eventCategoryColors: Record<string, string> = {
-  cultural: 'text-primary',
-  gaming: 'text-coral',
-  workshop: 'text-mystic',
+  cultural: "text-primary",
+  gaming: "text-coral",
+  workshop: "text-mystic",
 };
 
-export const CartSummary = ({ className }: CartSummaryProps) => {
+export const CartSummary = ({
+  className,
+  onCheckoutClick,
+}: CartSummaryProps) => {
   const navigate = useNavigate();
-  const { cartItems, totalAmount, totalItems, passItems, eventItems, removeFromCart, updateQuantity } = useCart();
+  const {
+    cartItems,
+    totalAmount,
+    totalItems,
+    passItems,
+    eventItems,
+    removeFromCart,
+    updateQuantity,
+  } = useCart();
 
   const handleCheckout = () => {
-    navigate('/checkout');
+    if (onCheckoutClick) onCheckoutClick();
+    navigate("/checkout");
   };
 
   if (cartItems.length === 0) {
     return (
-      <div className={cn('glass-card rounded-xl p-6 border border-border/50', className)}>
+      <div
+        className={cn(
+          "glass-card rounded-xl p-6 border border-border/50",
+          className,
+        )}
+      >
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <ShoppingBag className="w-12 h-12 text-muted-foreground/50 mb-4" />
           <h3 className="font-cinzel text-lg text-foreground mb-2">
@@ -44,31 +69,43 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
     );
   }
 
-  const passSubtotal = passItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const eventSubtotal = eventItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const passSubtotal = passItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const eventSubtotal = eventItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   return (
-    <div className={cn('glass-card rounded-xl border border-border/50 overflow-hidden', className)}>
-      {/* Header */}
+    <div
+      className={cn(
+        "glass-card rounded-xl border border-border/50 overflow-hidden",
+        className,
+      )}
+    >
       <div className="p-4 border-b border-border/50 bg-secondary/20">
         <h3 className="font-cinzel text-lg text-foreground flex items-center gap-2">
           <ShoppingBag className="w-5 h-5 text-primary" />
           Your Selection
           <span className="ml-auto text-sm text-muted-foreground">
-            {totalItems} {totalItems === 1 ? 'item' : 'items'}
+            {totalItems} {totalItems === 1 ? "item" : "items"}
           </span>
         </h3>
       </div>
 
-      {/* Cart items */}
       <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
-        {/* Passes Section */}
         {passItems.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Ticket className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium text-foreground">Passes</span>
-              <span className="text-xs text-muted-foreground ml-auto">₹{passSubtotal}</span>
+              <span className="text-sm font-medium text-foreground">
+                Passes
+              </span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                ₹{passSubtotal}
+              </span>
             </div>
             <div className="space-y-2">
               {passItems.map((item) => (
@@ -77,7 +114,12 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
                   className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20 border border-border/30"
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className={cn('font-medium text-sm truncate', passTierColors[item.tier])}>
+                    <h4
+                      className={cn(
+                        "font-medium text-sm truncate",
+                        passTierColors[item.tier],
+                      )}
+                    >
                       {item.name}
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -85,28 +127,32 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
                     </p>
                   </div>
 
-                  {/* Quantity controls */}
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
-                      onClick={() => updateQuantity(item.id, 'pass', item.quantity - 1)}
+                      onClick={() =>
+                        updateQuantity(item.id, "pass", item.quantity - 1)
+                      }
                     >
                       <Minus className="w-3 h-3" />
                     </Button>
-                    <span className="w-6 text-center text-sm">{item.quantity}</span>
+                    <span className="w-6 text-center text-sm">
+                      {item.quantity}
+                    </span>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
-                      onClick={() => updateQuantity(item.id, 'pass', item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(item.id, "pass", item.quantity + 1)
+                      }
                     >
                       <Plus className="w-3 h-3" />
                     </Button>
                   </div>
 
-                  {/* Item total and remove */}
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-medium text-foreground">
                       ₹{item.price * item.quantity}
@@ -115,7 +161,7 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 text-destructive hover:text-destructive"
-                      onClick={() => removeFromCart(item.id, 'pass')}
+                      onClick={() => removeFromCart(item.id, "pass")}
                     >
                       <Trash2 className="w-3 h-3" />
                     </Button>
@@ -126,13 +172,16 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
           </div>
         )}
 
-        {/* Events Section */}
         {eventItems.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Calendar className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Events</span>
-              <span className="text-xs text-muted-foreground ml-auto">₹{eventSubtotal}</span>
+              <span className="text-sm font-medium text-foreground">
+                Events
+              </span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                ₹{eventSubtotal}
+              </span>
             </div>
             <div className="space-y-2">
               {eventItems.map((item) => (
@@ -141,36 +190,45 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
                   className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20 border border-border/30"
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className={cn('font-medium text-sm truncate', eventCategoryColors[item.category])}>
+                    <h4
+                      className={cn(
+                        "font-medium text-sm truncate",
+                        eventCategoryColors[item.category],
+                      )}
+                    >
                       {item.name}
                     </h4>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
                       Day {item.day} • {item.teamSize} • ₹{item.price}
                     </p>
                   </div>
 
-                  {/* Quantity controls */}
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
-                      onClick={() => updateQuantity(item.id, 'event', item.quantity - 1)}
+                      onClick={() =>
+                        updateQuantity(item.id, "event", item.quantity - 1)
+                      }
                     >
                       <Minus className="w-3 h-3" />
                     </Button>
-                    <span className="w-6 text-center text-sm">{item.quantity}</span>
+                    <span className="w-6 text-center text-sm">
+                      {item.quantity}
+                    </span>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6"
-                      onClick={() => updateQuantity(item.id, 'event', item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(item.id, "event", item.quantity + 1)
+                      }
                     >
                       <Plus className="w-3 h-3" />
                     </Button>
                   </div>
 
-                  {/* Item total and remove */}
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-medium text-foreground">
                       ₹{item.price * item.quantity}
@@ -179,7 +237,7 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
                       variant="ghost"
                       size="icon"
                       className="h-6 w-6 text-destructive hover:text-destructive"
-                      onClick={() => removeFromCart(item.id, 'event')}
+                      onClick={() => removeFromCart(item.id, "event")}
                     >
                       <Trash2 className="w-3 h-3" />
                     </Button>
@@ -191,7 +249,6 @@ export const CartSummary = ({ className }: CartSummaryProps) => {
         )}
       </div>
 
-      {/* Footer with total and checkout */}
       <div className="p-4 border-t border-border/50 bg-secondary/20">
         <div className="flex items-center justify-between mb-4">
           <span className="text-muted-foreground">Grand Total</span>
