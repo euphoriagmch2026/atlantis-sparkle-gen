@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,11 +7,11 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface VerifyRequest {
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-}
+const VerifySchema = z.object({
+  razorpay_order_id: z.string().regex(/^order_[A-Za-z0-9]+$/, "Invalid order ID format"),
+  razorpay_payment_id: z.string().regex(/^pay_[A-Za-z0-9]+$/, "Invalid payment ID format"),
+  razorpay_signature: z.string().regex(/^[a-f0-9]{64}$/, "Invalid signature format"),
+});
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -23,12 +24,16 @@ Deno.serve(async (req) => {
       throw new Error("Razorpay secret not configured");
     }
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature }: VerifyRequest =
-      await req.json();
-
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      throw new Error("Missing payment verification fields");
+    const body = await req.json();
+    const parsed = VerifySchema.safeParse(body);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ verified: false, error: "Validation failed", details: parsed.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = parsed.data;
 
     // Verify signature using HMAC SHA256
     const encoder = new TextEncoder();
