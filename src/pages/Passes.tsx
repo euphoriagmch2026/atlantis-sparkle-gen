@@ -1,18 +1,44 @@
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { FloatingParticles } from "@/components/landing/FloatingParticles";
 import { PassCard } from "@/components/passes/PassCard";
 import { CartSummary } from "@/components/passes/CartSummary";
 import { useCart } from "@/contexts/CartContext";
-import { PASSES } from "@/types/passes";
+import { Pass } from "@/types/passes";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const Passes = () => {
   const { totalItems } = useCart();
   const navigate = useNavigate();
+  const [passes, setPasses] = useState<Pass[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPasses = async () => {
+      const { data, error } = await supabase
+        .from("passes")
+        .select("*");
+      if (!error && data) {
+        setPasses(
+          data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            price: p.price,
+            benefits: p.benefits || [],
+            tier: p.tier as 'basic' | 'earlybird',
+          }))
+        );
+      }
+      setLoading(false);
+    };
+    fetchPasses();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -35,11 +61,15 @@ const Passes = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                {PASSES.map((pass) => (
-                  <PassCard key={pass.id} pass={pass} />
-                ))}
-              </div>
+              {loading ? (
+                <div className="text-center py-20 text-muted-foreground">Loading passes...</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                  {passes.map((pass) => (
+                    <PassCard key={pass.id} pass={pass} />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="hidden lg:block w-80 shrink-0">
@@ -51,7 +81,6 @@ const Passes = () => {
         </div>
       </section>
 
-      {/* FIXED: No Drawer on mobile. Standard navigation prevents body lock */}
       <div className="fixed bottom-6 right-6 lg:hidden z-40">
         <Button
           size="lg"

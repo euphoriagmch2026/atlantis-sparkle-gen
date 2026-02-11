@@ -17,11 +17,8 @@ export interface PaymentResult {
 
 interface CartItemForOrder {
   id: string;
-  name: string;
-  price: number;
   quantity: number;
   type: 'pass' | 'event';
-  metadata?: Record<string, unknown>;
 }
 
 interface UserDetails {

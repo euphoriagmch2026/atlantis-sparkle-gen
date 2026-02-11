@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          category: string
+          created_at: string
+          day: number
+          description: string | null
+          duration: string | null
+          fee: number
+          id: string
+          name: string
+          poster_url: string | null
+          prize_pool: string | null
+          team_size: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          day: number
+          description?: string | null
+          duration?: string | null
+          fee?: number
+          id: string
+          name: string
+          poster_url?: string | null
+          prize_pool?: string | null
+          team_size: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          day?: number
+          description?: string | null
+          duration?: string | null
+          fee?: number
+          id?: string
+          name?: string
+          poster_url?: string | null
+          prize_pool?: string | null
+          team_size?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -71,6 +113,7 @@ export type Database = {
           team_members: string[] | null
           total_amount: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           college: string
@@ -87,6 +130,7 @@ export type Database = {
           team_members?: string[] | null
           total_amount: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           college?: string
@@ -103,6 +147,37 @@ export type Database = {
           team_members?: string[] | null
           total_amount?: number
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      passes: {
+        Row: {
+          benefits: string[]
+          created_at: string
+          description: string
+          id: string
+          name: string
+          price: number
+          tier: string
+        }
+        Insert: {
+          benefits?: string[]
+          created_at?: string
+          description: string
+          id: string
+          name: string
+          price: number
+          tier: string
+        }
+        Update: {
+          benefits?: string[]
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          price?: number
+          tier?: string
         }
         Relationships: []
       }
@@ -111,7 +186,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_order_summary: {
+        Args: { p_email: string; p_order_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

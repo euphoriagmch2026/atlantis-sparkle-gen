@@ -31,8 +31,6 @@ const Checkout = () => {
   ) => {
     const cartItemsForOrder = cartItems.map((item) => ({
       id: item.id,
-      name: item.name,
-      price: item.price,
       quantity: item.quantity,
       type: item.type,
     }));
