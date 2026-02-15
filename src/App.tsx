@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./contexts/CartContext";
 import ScrollRecovery from "./components/ScrollRecovery"; // New import
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Contact from "./pages/Contact";
+import Schedule from "./pages/Schedule";
 import Passes from "./pages/Passes";
 import Events from "./pages/Events";
 import Checkout from "./pages/Checkout";
@@ -25,6 +28,9 @@ const App = () => (
           <ScrollRecovery /> {/* Mount failsafe here */}
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/schedule" element={<Schedule />} />
             <Route path="/passes" element={<Passes />} />
             <Route path="/events" element={<Events />} />
             <Route path="/cart" element={<CartPage />} /> {/* New route */}

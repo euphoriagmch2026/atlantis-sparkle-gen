@@ -140,7 +140,8 @@ Deno.serve(async (req) => {
         full_name: userDetails.fullName,
         email: userDetails.email,
         phone: userDetails.phone,
-        college: userDetails.college,
+        college: userDetails.college,\
+        user_id: userDetails.userId, 
         team_members: userDetails.teamMembers.filter(m => m.length > 0),
         total_amount: totalPaise,
         status: "created",
