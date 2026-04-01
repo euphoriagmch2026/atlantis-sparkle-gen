@@ -1,24 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { FloatingParticles } from "@/components/landing/FloatingParticles";
-import {
-  CheckoutForm,
-  CheckoutFormData,
-} from "@/components/checkout/CheckoutForm";
+import { CheckoutForm, CheckoutFormData } from "@/components/checkout/CheckoutForm";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useRazorpay } from "@/hooks/useRazorpay";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, totalAmount, clearCart } = useCart();
   const { initiatePayment, isLoading } = useRazorpay();
   const { toast } = useToast();
+  const [prefill, setPrefill] = useState<Partial<CheckoutFormData> | null>(null);
 
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -26,9 +25,30 @@ const Checkout = () => {
     }
   }, [cartItems.length, navigate]);
 
-  const handleSubmit = async (
-    data: CheckoutFormData & { teamMembers: string[] },
-  ) => {
+  // Pre-fill from profile if logged in
+  useEffect(() => {
+    const loadProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, phone, college")
+          .eq("id", user.id)
+          .single();
+        if (profile) {
+          setPrefill({
+            fullName: profile.full_name || "",
+            email: user.email || "",
+            phone: profile.phone || "",
+            college: profile.college || "",
+          });
+        }
+      }
+    };
+    loadProfile();
+  }, []);
+
+  const handleSubmit = async (data: CheckoutFormData & { teamMembers: string[] }) => {
     const cartItemsForOrder = cartItems.map((item) => ({
       id: item.id,
       quantity: item.quantity,
@@ -69,23 +89,16 @@ const Checkout = () => {
       <Navbar />
       <main className="relative pt-24 md:pt-28 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-6 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Cart
+          <Button variant="ghost" onClick={() => navigate(-1)}
+            className="mb-6 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Cart
           </Button>
           <div className="text-center mb-10">
-            <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-3 text-glow">
-              Checkout
-            </h1>
+            <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-3 text-glow">Checkout</h1>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Form stacks BELOW summary on mobile for better visibility */}
             <div className="lg:col-span-3 order-2 lg:order-1">
-              <CheckoutForm onSubmit={handleSubmit} isLoading={isLoading} />
+              <CheckoutForm onSubmit={handleSubmit} isLoading={isLoading} defaultValues={prefill || undefined} />
             </div>
             <div className="lg:col-span-2 order-1 lg:order-2">
               <div className="lg:sticky lg:top-28">

@@ -11,9 +11,9 @@ export const Footer = () => {
 
   const quickLinks = [
     { label: "Events", href: "/events" },
-    { label: "Schedule", href: "#schedule" },
+    { label: "Schedule", href: "/schedule" },
     { label: "Passes", href: "/passes" },
-    { label: "Register", href: "#register" },
+    { label: "Register", href: "/auth?tab=register" },
   ];
 
   return (

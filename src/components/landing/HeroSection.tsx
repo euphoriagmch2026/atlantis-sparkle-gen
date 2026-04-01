@@ -82,6 +82,7 @@ export const HeroSection = () => {
           <Button
             size="lg"
             variant="outline"
+            onClick={() => navigate("/auth?tab=register")}
             className="min-w-[180px] border-primary/50 text-primary hover:bg-primary/10 font-semibold tracking-wide transition-all duration-300"
           >
             Register Now
