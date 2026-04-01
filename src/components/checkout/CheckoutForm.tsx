@@ -41,6 +41,7 @@ export const CheckoutForm = ({ onSubmit, isLoading = false, defaultValues }: Che
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     mode: 'onBlur',
+    defaultValues: defaultValues || {},
   });
 
   const addTeamMember = () => {
