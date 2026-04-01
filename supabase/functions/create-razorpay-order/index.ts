@@ -57,6 +57,15 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Extract authenticated user (if any) for user_id
+    let userId: string | null = null;
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) userId = user.id;
+    }
+
     // ---- SERVER-SIDE PRICING: Fetch real prices from DB ----
     const passIds = cartItems.filter(i => i.type === "pass").map(i => i.id);
     const eventIds = cartItems.filter(i => i.type === "event").map(i => i.id);
