@@ -21,9 +21,10 @@ export type CheckoutFormData = z.infer<typeof checkoutSchema>;
 interface CheckoutFormProps {
   onSubmit: (data: CheckoutFormData & { teamMembers: string[] }) => void;
   isLoading?: boolean;
+  defaultValues?: Partial<CheckoutFormData>;
 }
 
-export const CheckoutForm = ({ onSubmit, isLoading = false }: CheckoutFormProps) => {
+export const CheckoutForm = ({ onSubmit, isLoading = false, defaultValues }: CheckoutFormProps) => {
   const { eventItems } = useCart();
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
   
@@ -40,6 +41,7 @@ export const CheckoutForm = ({ onSubmit, isLoading = false }: CheckoutFormProps)
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     mode: 'onBlur',
+    defaultValues: defaultValues || {},
   });
 
   const addTeamMember = () => {
