@@ -1,5 +1,5 @@
-import { Calendar, Users, Trophy, Sparkles } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { Calendar, Users, Trophy, Sparkles } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 
 interface StatItem {
   icon: React.ReactNode;
@@ -9,22 +9,45 @@ interface StatItem {
 }
 
 const stats: StatItem[] = [
-  { icon: <Sparkles className="w-8 h-8" />, value: 50, suffix: '+', label: 'Events' },
-  { icon: <Users className="w-8 h-8" />, value: 4000, suffix: '+', label: 'Attendees' },
-  { icon: <Calendar className="w-8 h-8" />, value: 4, suffix: '', label: 'Days' },
+  {
+    icon: <Sparkles className="w-8 h-8" />,
+    value: 50,
+    suffix: "+",
+    label: "Events",
+  },
+  {
+    icon: <Users className="w-8 h-8" />,
+    value: 4000,
+    suffix: "+",
+    label: "Attendees",
+  },
+  {
+    icon: <Calendar className="w-8 h-8" />,
+    value: 3,
+    suffix: "",
+    label: "Days",
+  },
 ];
 
-const AnimatedCounter = ({ target, suffix, inView }: { target: number; suffix: string; inView: boolean }) => {
+const AnimatedCounter = ({
+  target,
+  suffix,
+  inView,
+}: {
+  target: number;
+  suffix: string;
+  inView: boolean;
+}) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!inView) return;
-    
+
     const duration = 2000;
     const steps = 60;
     const increment = target / steps;
     let current = 0;
-    
+
     const timer = setInterval(() => {
       current += increment;
       if (current >= target) {
@@ -40,7 +63,8 @@ const AnimatedCounter = ({ target, suffix, inView }: { target: number; suffix: s
 
   return (
     <span className="font-cinzel text-4xl md:text-5xl font-bold text-primary text-glow">
-      {count.toLocaleString()}{suffix}
+      {count.toLocaleString()}
+      {suffix}
     </span>
   );
 };
@@ -56,7 +80,7 @@ export const OverviewSection = () => {
           setInView(true);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     if (sectionRef.current) {
@@ -72,31 +96,37 @@ export const OverviewSection = () => {
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Dive Into the <span className="text-primary text-glow">Experience</span>
+            Dive Into the{" "}
+            <span className="text-primary text-glow">Experience</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            EUPHORIA is more than a fest — it's an odyssey through music, dance, technology, and creativity.
-            Join thousands of students from across the nation in this legendary celebration.
+            EUPHORIA is more than a fest — it's an odyssey through music, dance,
+            technology, and creativity. Join thousands of students from across
+            the nation in this legendary celebration.
           </p>
         </div>
 
         {/* Stats grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8">
           {stats.map((stat, index) => (
-            <div 
+            <div
               key={stat.label}
               className="glass-card rounded-xl p-6 text-center border-glow hover:scale-105 transition-transform duration-300"
-              style={{ 
+              style={{
                 animationDelay: `${index * 0.1}s`,
                 opacity: inView ? 1 : 0,
-                transform: inView ? 'translateY(0)' : 'translateY(20px)',
-                transition: `all 0.6s ease ${index * 0.1}s`
+                transform: inView ? "translateY(0)" : "translateY(20px)",
+                transition: `all 0.6s ease ${index * 0.1}s`,
               }}
             >
               <div className="text-accent mb-4 flex justify-center">
                 {stat.icon}
               </div>
-              <AnimatedCounter target={stat.value} suffix={stat.suffix} inView={inView} />
+              <AnimatedCounter
+                target={stat.value}
+                suffix={stat.suffix}
+                inView={inView}
+              />
               <p className="text-muted-foreground mt-2 text-sm uppercase tracking-wider">
                 {stat.label}
               </p>
