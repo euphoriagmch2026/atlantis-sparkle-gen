@@ -26,6 +26,7 @@ export type Database = {
           name: string
           poster_url: string | null
           prize_pool: string | null
+          rules: string | null
           team_size: string
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           name: string
           poster_url?: string | null
           prize_pool?: string | null
+          rules?: string | null
           team_size: string
         }
         Update: {
@@ -52,6 +54,7 @@ export type Database = {
           name?: string
           poster_url?: string | null
           prize_pool?: string | null
+          rules?: string | null
           team_size?: string
         }
         Relationships: []
