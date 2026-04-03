@@ -170,9 +170,9 @@ export const Navbar = () => {
               <Button
                 size="sm"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)] hover:shadow-[0_0_25px_rgba(var(--primary),0.5)] transition-shadow"
-                onClick={() => navigate("/passes")}
+                onClick={() => navigate("/auth")}
               >
-                Get Passes
+                Register
               </Button>
             </div>
           )}
