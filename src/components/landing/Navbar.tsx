@@ -19,7 +19,6 @@ const navLinks = [
   { label: "Home", href: "/" },
   { label: "Events", href: "/events" },
   { label: "Schedule", href: "/schedule" },
-  { label: "Passes", href: "/passes" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -143,8 +142,8 @@ export const Navbar = () => {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/passes")}>
-                  Buy Passes
+              <DropdownMenuItem onClick={() => navigate("/events")}>
+                  Browse Events
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/cart")}>
                   View Cart
@@ -171,9 +170,9 @@ export const Navbar = () => {
               <Button
                 size="sm"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)] hover:shadow-[0_0_25px_rgba(var(--primary),0.5)] transition-shadow"
-                onClick={() => navigate("/passes")}
+                onClick={() => navigate("/auth")}
               >
-                Get Passes
+                Register
               </Button>
             </div>
           )}
@@ -255,11 +254,11 @@ export const Navbar = () => {
                 <Button
                   className="w-full bg-primary text-primary-foreground"
                   onClick={() => {
-                    navigate("/passes");
+                    navigate("/auth");
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Get Passes
+                  Register
                 </Button>
               </>
             )}

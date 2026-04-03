@@ -7,20 +7,15 @@ import {
   Plus,
   Ticket,
   Calendar,
+  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
-import { PassTier } from "@/types/passes";
 
 interface CartSummaryProps {
   className?: string;
-  onCheckoutClick?: () => void; // Prop to handle drawer closure
+  onCheckoutClick?: () => void;
 }
-
-const passTierColors: Record<PassTier, string> = {
-  basic: "text-primary",
-  earlybird: "text-accent",
-};
 
 const eventCategoryColors: Record<string, string> = {
   cultural: "text-primary",
@@ -41,10 +36,11 @@ export const CartSummary = ({
     eventItems,
     removeFromCart,
     updateQuantity,
+    isAutoItem,
   } = useCart();
 
   const handleCheckout = () => {
-    if (onCheckoutClick) onCheckoutClick(); // Close drawer before navigating
+    if (onCheckoutClick) onCheckoutClick();
     navigate("/checkout");
   };
 
@@ -62,21 +58,20 @@ export const CartSummary = ({
             Your treasure chest is empty
           </h3>
           <p className="text-sm text-muted-foreground">
-            Add some passes or events to begin your journey
+            Add events to begin your journey
           </p>
         </div>
       </div>
     );
   }
 
-  const passSubtotal = passItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
   const eventSubtotal = eventItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+
+  // Registration fee (auto-added pass item)
+  const regItem = passItems.find((p) => isAutoItem(p.id));
 
   return (
     <div
@@ -96,80 +91,33 @@ export const CartSummary = ({
       </div>
 
       <div className="p-4 space-y-4 max-h-[400px] overflow-y-auto">
-        {passItems.length > 0 && (
+        {/* Registration Fee (non-editable) */}
+        {regItem && (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Ticket className="w-4 h-4 text-accent" />
               <span className="text-sm font-medium text-foreground">
-                Passes
-              </span>
-              <span className="text-xs text-muted-foreground ml-auto">
-                ₹{passSubtotal}
+                Registration Fee
               </span>
             </div>
-            <div className="space-y-2">
-              {passItems.map((item) => (
-                <div
-                  key={`pass-${item.id}`}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-secondary/20 border border-border/30"
-                >
-                  <div className="flex-1 min-w-0">
-                    <h4
-                      className={cn(
-                        "font-medium text-sm truncate",
-                        passTierColors[item.tier],
-                      )}
-                    >
-                      {item.name}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      ₹{item.price} × {item.quantity}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() =>
-                        updateQuantity(item.id, "pass", item.quantity - 1)
-                      }
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    <span className="w-6 text-center text-sm">
-                      {item.quantity}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() =>
-                        updateQuantity(item.id, "pass", item.quantity + 1)
-                      }
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-sm font-medium text-foreground">
-                      ₹{item.price * item.quantity}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 text-destructive hover:text-destructive"
-                      onClick={() => removeFromCart(item.id, "pass")}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border/30">
+              <div className="flex items-center gap-2">
+                <Lock className="w-3 h-3 text-muted-foreground" />
+                <span className="text-sm text-primary font-medium">
+                  {regItem.name}
+                </span>
+              </div>
+              <span className="text-sm font-medium text-foreground">
+                ₹{regItem.price}
+              </span>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-1 ml-1">
+              Automatically included with events
+            </p>
           </div>
         )}
 
+        {/* Events */}
         {eventItems.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">

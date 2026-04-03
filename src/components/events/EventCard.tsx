@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Users, Clock, Trophy, IndianRupee, ShoppingCart, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 export interface Event {
   id: string;
@@ -15,6 +16,7 @@ export interface Event {
   prizePool: string;
   description: string;
   posterUrl?: string;
+  rules?: string;
 }
 
 interface EventCardProps {
@@ -31,17 +33,26 @@ export const EventCard = ({ event }: EventCardProps) => {
   const colorKey = categoryColors[event.category];
   const { addEventToCart, isInCart } = useCart();
   const inCart = isInCart(event.id, 'event');
+  const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
     addEventToCart(event);
+  };
+
+  const handleCardClick = () => {
+    navigate(`/events/${event.id}`);
   };
   
   return (
-    <Card className={cn(
-      "group glass-card border-border/50 overflow-hidden transition-all duration-500",
-      "hover:scale-[1.02] hover:border-primary/50",
-      `hover:shadow-[0_0_40px_hsl(var(--${colorKey})/0.3)]`
-    )}>
+    <Card
+      onClick={handleCardClick}
+      className={cn(
+        "group glass-card border-border/50 overflow-hidden transition-all duration-500 cursor-pointer",
+        "hover:scale-[1.02] hover:border-primary/50",
+        `hover:shadow-[0_0_40px_hsl(var(--${colorKey})/0.3)]`
+      )}
+    >
       {/* Poster area */}
       <div className="relative h-48 bg-gradient-to-br from-primary/20 to-accent/10 overflow-hidden">
         {event.posterUrl ? (
