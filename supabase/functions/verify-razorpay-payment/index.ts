@@ -38,6 +38,14 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+    const clientIP = req.headers.get("x-forwarded-for") || "unknown";
+    if (!checkRateLimit(clientIP)) {
+      return new Response(
+        JSON.stringify({ verified: false, error: "Rate limit exceeded. Try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
   try {
     const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET");
     if (!RAZORPAY_KEY_SECRET) {
