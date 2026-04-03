@@ -7,6 +7,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Simple in-memory rate limiter
+const rateLimiter = new Map<string, { count: number; resetAt: number }>();
+function checkRateLimit(ip: string, limit = 15, windowMs = 60000): boolean {
+  const now = Date.now();
+  const record = rateLimiter.get(ip);
+  if (!record || now > record.resetAt) {
+    rateLimiter.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (record.count >= limit) return false;
+  record.count++;
+  return true;
+}
+
 const VerifySchema = z.object({
   razorpay_order_id: z
     .string()
