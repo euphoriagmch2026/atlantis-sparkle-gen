@@ -1,6 +1,9 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { CartItem, Pass, PassCartItem, EventCartItem } from '@/types/passes';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from 'react';
+import { CartItem, PassCartItem, EventCartItem } from '@/types/passes';
 import { Event } from '@/components/events/EventCard';
+import { supabase } from '@/integrations/supabase/client';
+
+export const BASIC_REGISTRATION_ID = 'basic-registration';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -8,12 +11,12 @@ interface CartContextType {
   totalItems: number;
   passItems: PassCartItem[];
   eventItems: EventCartItem[];
-  addPassToCart: (pass: Pass, quantity?: number) => void;
   addEventToCart: (event: Event, quantity?: number) => void;
   removeFromCart: (itemId: string, type: 'pass' | 'event') => void;
   updateQuantity: (itemId: string, type: 'pass' | 'event', quantity: number) => void;
   clearCart: () => void;
   isInCart: (itemId: string, type: 'pass' | 'event') => boolean;
+  isAutoItem: (itemId: string) => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,6 +29,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   });
+
+  const regPriceRef = useRef<number>(299); // fallback
+  const regPriceLoaded = useRef(false);
+
+  // Fetch registration price once
+  useEffect(() => {
+    if (regPriceLoaded.current) return;
+    supabase
+      .from('passes')
+      .select('price')
+      .eq('id', BASIC_REGISTRATION_ID)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          regPriceRef.current = data.price;
+          regPriceLoaded.current = true;
+        }
+      });
+  }, []);
 
   // Persist to localStorage
   useEffect(() => {
@@ -42,57 +64,71 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const addPassToCart = useCallback((pass: Pass, quantity = 1) => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.id === pass.id && item.type === 'pass');
-      if (existing) {
-        return prev.map((item) =>
-          item.id === pass.id && item.type === 'pass'
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      const newItem: PassCartItem = {
-        id: pass.id,
-        name: pass.name,
-        price: pass.price,
-        quantity,
-        type: 'pass',
-        tier: pass.tier,
-      };
-      return [...prev, newItem];
-    });
+  const isAutoItem = useCallback((itemId: string) => {
+    return itemId === BASIC_REGISTRATION_ID;
   }, []);
 
   const addEventToCart = useCallback((event: Event, quantity = 1) => {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === event.id && item.type === 'event');
+      let next: CartItem[];
       if (existing) {
-        return prev.map((item) =>
+        next = prev.map((item) =>
           item.id === event.id && item.type === 'event'
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
+      } else {
+        const newItem: EventCartItem = {
+          id: event.id,
+          name: event.name,
+          price: event.fee,
+          quantity,
+          type: 'event',
+          category: event.category,
+          day: event.day,
+          teamSize: event.teamSize,
+        };
+        next = [...prev, newItem];
       }
-      const newItem: EventCartItem = {
-        id: event.id,
-        name: event.name,
-        price: event.fee,
-        quantity,
-        type: 'event',
-        category: event.category,
-        day: event.day,
-        teamSize: event.teamSize,
-      };
-      return [...prev, newItem];
+
+      // Auto-add basic registration if not present
+      const hasReg = next.some((item) => item.id === BASIC_REGISTRATION_ID && item.type === 'pass');
+      if (!hasReg) {
+        const regItem: PassCartItem = {
+          id: BASIC_REGISTRATION_ID,
+          name: 'Basic Registration',
+          price: regPriceRef.current,
+          quantity: 1,
+          type: 'pass',
+          tier: 'basic',
+        };
+        next = [regItem, ...next];
+      }
+
+      return next;
     });
   }, []);
 
   const removeFromCart = useCallback((itemId: string, type: 'pass' | 'event') => {
-    setCartItems((prev) => prev.filter((item) => !(item.id === itemId && item.type === type)));
+    // Prevent manual removal of auto-item
+    if (itemId === BASIC_REGISTRATION_ID) return;
+
+    setCartItems((prev) => {
+      const next = prev.filter((item) => !(item.id === itemId && item.type === type));
+      // If no event items remain, auto-remove registration
+      const hasEvents = next.some((item) => item.type === 'event');
+      if (!hasEvents) {
+        return next.filter((item) => item.id !== BASIC_REGISTRATION_ID);
+      }
+      return next;
+    });
   }, []);
 
   const updateQuantity = useCallback((itemId: string, type: 'pass' | 'event', quantity: number) => {
+    // Prevent quantity change on auto-item
+    if (itemId === BASIC_REGISTRATION_ID) return;
+
     if (quantity <= 0) {
       removeFromCart(itemId, type);
       return;
@@ -120,12 +156,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalItems,
         passItems,
         eventItems,
-        addPassToCart,
         addEventToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         isInCart,
+        isAutoItem,
       }}
     >
       {children}

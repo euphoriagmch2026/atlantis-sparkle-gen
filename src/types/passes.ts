@@ -22,14 +22,3 @@ export interface EventCartItem extends CartItemBase {
 }
 
 export type CartItem = PassCartItem | EventCartItem;
-
-export interface Pass {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  benefits: string[];
-  tier: PassTier;
-}
-
-// PASSES data is now fetched from the database. See src/pages/Passes.tsx.

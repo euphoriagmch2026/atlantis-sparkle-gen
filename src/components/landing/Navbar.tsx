@@ -254,11 +254,11 @@ export const Navbar = () => {
                 <Button
                   className="w-full bg-primary text-primary-foreground"
                   onClick={() => {
-                    navigate("/passes");
+                    navigate("/auth");
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Get Passes
+                  Register
                 </Button>
               </>
             )}
