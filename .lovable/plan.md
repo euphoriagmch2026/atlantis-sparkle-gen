@@ -1,45 +1,41 @@
 
 
-# Implementation Plan
+# Fix Price Display & Create Order Details View
 
-## Analysis Summary
+## 1. Fix Paise-to-Rupees Display in Profile.tsx
 
-After reviewing the codebase, here's what I found:
+Two lines need updating:
 
-- **The edge function already inserts order items** (lines 186-200 of `create-razorpay-order/index.ts`) and already extracts `user_id` from the auth header (lines 82-89). The `orders` table already has a `user_id` column and an RLS policy for authenticated SELECT. So request #2 is **already implemented** — no DB or edge function changes needed.
-- **Checkout.tsx line 24** still navigates to `/passes` on empty cart — needs to be `/events`.
-- **HeroSection** still has the "Buy Passes" button — needs removal.
-- **Profile page** does not exist yet — needs creation.
+- **Line 173** (order total): Change `₹{order.total_amount}` → `₹{(order.total_amount / 100).toFixed(2)}`
+- **Line 189** (item price): Change `₹{item.price * item.quantity}` → `₹{((item.price * item.quantity) / 100).toFixed(2)}`
 
-## Changes
+## 2. Create `user_order_details_view` (DB Migration)
 
-### 1. HeroSection — Remove "Buy Passes" button
-**File:** `src/components/landing/HeroSection.tsx`
-- Delete lines 74-81 (the "Buy Passes" Button block)
-- The remaining two buttons ("Explore Events" and "Register Now") stay centered via the existing flex layout
+A SQL view joining `orders` and `order_items`:
 
-### 2. Checkout.tsx — Fix stale redirect
-**File:** `src/pages/Checkout.tsx`
-- Line 24: Change `navigate("/passes")` to `navigate("/events")`
+```sql
+CREATE VIEW public.user_order_details_view AS
+SELECT
+  o.id AS order_id,
+  o.created_at,
+  o.full_name,
+  o.email,
+  o.phone,
+  o.status,
+  o.total_amount / 100.0 AS total_rupees,
+  oi.item_name,
+  oi.quantity,
+  oi.price / 100.0 AS item_price_rupees
+FROM public.orders o
+JOIN public.order_items oi ON oi.order_id = o.id;
+```
 
-### 3. Create Profile page
-**File:** `src/pages/Profile.tsx` (new)
-- Check auth state; redirect to `/auth` if not logged in
-- Fetch profile from `profiles` table
-- Fetch orders with items: `supabase.from('orders').select('*, order_items(*)').eq('user_id', user.id).order('created_at', { ascending: false })`
-- Display profile info (name, email, phone, college) in a card at the top
-- Display order history below using cards — each showing: order ID (truncated razorpay_order_id), date, status badge, total amount, and expandable list of order_items (item name, quantity, price)
-- Styled with existing Atlantis theme (glass-card, FloatingParticles)
+## 3. Edge Function Verification
 
-### 4. Add `/profile` route
-**File:** `src/App.tsx`
-- Import Profile page and add `<Route path="/profile" element={<Profile />} />`
+The `create-razorpay-order` edge function already correctly:
+- Extracts `user_id` from the auth header (lines 82-89)
+- Inserts `full_name`, `email`, `phone`, `college`, `user_id` into `orders` (lines 167-181)
+- Loops through line items and inserts each into `order_items` with `order_id` (lines 186-198)
 
-### 5. Navbar — Add "Profile & Orders" link
-**File:** `src/components/landing/Navbar.tsx`
-- In the desktop dropdown menu (line 143-158): Add a `DropdownMenuItem` labeled "Profile & Orders" that navigates to `/profile`, placed before "Browse Events"
-- In the mobile menu (lines 226-241): Add a "Profile & Orders" button/link for logged-in users
-
-### 6. No database or edge function changes needed
-The `orders.user_id`, order items insertion, and RLS policies are already correctly implemented.
+No edge function changes needed.
 
