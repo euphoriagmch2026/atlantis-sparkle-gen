@@ -234,6 +234,16 @@ export const Navbar = () => {
                   {user.email}
                 </div>
                 <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/profile");
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Profile & Orders
+                </Button>
+                <Button
                   variant="destructive"
                   className="w-full justify-start"
                   onClick={handleLogout}
