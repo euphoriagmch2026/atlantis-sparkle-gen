@@ -13,6 +13,7 @@ import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
 import Checkout from "./pages/Checkout";
 import CartPage from "./pages/Cart";
+import Profile from "./pages/Profile";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
 
