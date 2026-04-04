@@ -1,0 +1,1 @@
+ALTER VIEW public.user_order_details_view SET (security_invoker = on);
