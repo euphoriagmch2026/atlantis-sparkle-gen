@@ -74,14 +74,6 @@ export const HeroSection = () => {
           <Button
             size="lg"
             variant="outline"
-            onClick={() => navigate("/passes")}
-            className="min-w-[180px] border-accent text-accent hover:bg-accent hover:text-accent-foreground font-semibold tracking-wide transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--accent)/0.5)]"
-          >
-            Buy Passes
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
             onClick={() => navigate("/auth?tab=register")}
             className="min-w-[180px] border-primary/50 text-primary hover:bg-primary/10 font-semibold tracking-wide transition-all duration-300"
           >

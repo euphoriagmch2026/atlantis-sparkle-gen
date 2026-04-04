@@ -21,7 +21,7 @@ const Checkout = () => {
 
   useEffect(() => {
     if (cartItems.length === 0) {
-      navigate("/passes");
+      navigate("/events");
     }
   }, [cartItems.length, navigate]);
 
