@@ -122,6 +122,13 @@ export type Database = {
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "user_order_details_view"
+            referencedColumns: ["order_id"]
+          },
         ]
       }
       orders: {
@@ -237,7 +244,21 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_order_details_view: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          item_name: string | null
+          item_price_rupees: number | null
+          order_id: string | null
+          phone: string | null
+          quantity: number | null
+          status: string | null
+          total_rupees: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_order_summary: {
