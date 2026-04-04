@@ -186,7 +186,7 @@ const Profile = () => {
                             <span className="text-muted-foreground">
                               {item.item_name} {item.quantity > 1 ? `×${item.quantity}` : ""}
                             </span>
-                            <span className="text-foreground">₹{item.price * item.quantity}</span>
+                            <span className="text-foreground">₹{((item.price * item.quantity) / 100).toFixed(2)}</span>
                           </div>
                         ))}
                       </div>
