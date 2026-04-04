@@ -13,6 +13,7 @@ import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
 import Checkout from "./pages/Checkout";
 import CartPage from "./pages/Cart";
+import Profile from "./pages/Profile";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/events/:eventId" element={<EventDetails />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

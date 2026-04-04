@@ -142,6 +142,9 @@ export const Navbar = () => {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  Profile & Orders
+                </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/events")}>
                   Browse Events
                 </DropdownMenuItem>
@@ -230,6 +233,16 @@ export const Navbar = () => {
                   <UserIcon className="w-4 h-4" />
                   {user.email}
                 </div>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/profile");
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Profile & Orders
+                </Button>
                 <Button
                   variant="destructive"
                   className="w-full justify-start"
