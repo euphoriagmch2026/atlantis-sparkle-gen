@@ -170,7 +170,7 @@ const Profile = () => {
                           {order.status}
                         </Badge>
                       </div>
-                      <p className="text-foreground font-semibold">₹{order.total_amount}</p>
+                      <p className="text-foreground font-semibold">₹{(order.total_amount / 100).toFixed(2)}</p>
                     </div>
 
                     {order.razorpay_order_id && (
