@@ -142,6 +142,9 @@ export const Navbar = () => {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  Profile & Orders
+                </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/events")}>
                   Browse Events
                 </DropdownMenuItem>
