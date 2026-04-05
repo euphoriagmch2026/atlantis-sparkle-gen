@@ -13,7 +13,7 @@ interface EventFiltersProps {
 const categories = [
   { id: 'all', label: 'All Events' },
   { id: 'cultural', label: 'Cultural' },
-  { id: 'gaming', label: 'Gaming' },
+  { id: 'sports', label: 'Sports' },
   { id: 'workshop', label: 'Workshops' },
 ];
 

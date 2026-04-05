@@ -19,7 +19,7 @@ interface CartSummaryProps {
 
 const eventCategoryColors: Record<string, string> = {
   cultural: "text-primary",
-  gaming: "text-coral",
+  sports: "text-coral",
   workshop: "text-mystic",
 };
 

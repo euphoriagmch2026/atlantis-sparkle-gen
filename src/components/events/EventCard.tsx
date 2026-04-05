@@ -25,7 +25,7 @@ interface EventCardProps {
 
 const categoryColors = {
   cultural: 'primary',
-  gaming: 'coral',
+  sports: 'coral',
   workshop: 'mystic',
 } as const;
 
