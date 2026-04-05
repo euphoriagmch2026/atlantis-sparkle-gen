@@ -1,41 +1,34 @@
 
 
-# Fix Price Display & Create Order Details View
+# Rename "Gaming" → "Sports" Across the Application
 
-## 1. Fix Paise-to-Rupees Display in Profile.tsx
+## Overview
+Replace all references to "gaming" with "sports" in frontend code, types, and database records. Update the associated icon from `Gamepad2` to `Trophy`.
 
-Two lines need updating:
+## Changes
 
-- **Line 173** (order total): Change `₹{order.total_amount}` → `₹{(order.total_amount / 100).toFixed(2)}`
-- **Line 189** (item price): Change `₹{item.price * item.quantity}` → `₹{((item.price * item.quantity) / 100).toFixed(2)}`
+### 1. Frontend Components (7 files)
 
-## 2. Create `user_order_details_view` (DB Migration)
+| File | Change |
+|------|--------|
+| `src/components/events/EventFilters.tsx` | `{ id: 'gaming', label: 'Gaming' }` → `{ id: 'sports', label: 'Sports' }` |
+| `src/components/events/EventCard.tsx` | Type literal `'gaming'` → `'sports'`; key in `categoryColors` |
+| `src/components/landing/EventsPreviewSection.tsx` | Title `'Gaming'` → `'Sports'`, description updated, icon `Gamepad2` → `Trophy` |
+| `src/components/landing/ScheduleSection.tsx` | Key `gaming` → `sports` in `CATEGORY_COLORS` |
+| `src/components/checkout/OrderSummary.tsx` | Key `gaming` → `sports` in `eventCategoryColors` |
+| `src/components/passes/CartSummary.tsx` | Key `gaming` → `sports` in `eventCategoryColors` |
+| `src/pages/EventDetails.tsx` | Key `gaming` → `sports` in `categoryColors` |
+| `src/pages/Events.tsx` | Type cast `'gaming'` → `'sports'` |
 
-A SQL view joining `orders` and `order_items`:
+### 2. Types
+- `src/types/passes.ts`: Change `'cultural' | 'gaming' | 'workshop'` → `'cultural' | 'sports' | 'workshop'`
 
+### 3. Database Update
+Run an UPDATE on the `events` table to change existing records:
 ```sql
-CREATE VIEW public.user_order_details_view AS
-SELECT
-  o.id AS order_id,
-  o.created_at,
-  o.full_name,
-  o.email,
-  o.phone,
-  o.status,
-  o.total_amount / 100.0 AS total_rupees,
-  oi.item_name,
-  oi.quantity,
-  oi.price / 100.0 AS item_price_rupees
-FROM public.orders o
-JOIN public.order_items oi ON oi.order_id = o.id;
+UPDATE events SET category = 'sports' WHERE category = 'gaming';
 ```
 
-## 3. Edge Function Verification
-
-The `create-razorpay-order` edge function already correctly:
-- Extracts `user_id` from the auth header (lines 82-89)
-- Inserts `full_name`, `email`, `phone`, `college`, `user_id` into `orders` (lines 167-181)
-- Loops through line items and inserts each into `order_items` with `order_id` (lines 186-198)
-
-No edge function changes needed.
+### 4. Icon Change
+In `EventsPreviewSection.tsx`, replace `import { Gamepad2 }` with `import { Trophy }` from `lucide-react` and use `<Trophy />` for the Sports category card.
 
