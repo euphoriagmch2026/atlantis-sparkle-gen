@@ -22,7 +22,7 @@ const DAY_META: Record<number, { date: string; theme: string }> = {
 
 const CATEGORY_COLORS: Record<string, string> = {
   cultural: 'bg-primary/20 text-primary border-primary/30',
-  gaming: 'bg-accent/20 text-accent border-accent/30',
+  sports: 'bg-accent/20 text-accent border-accent/30',
   workshop: 'bg-[hsl(270,60%,50%)]/20 text-[hsl(270,60%,70%)] border-[hsl(270,60%,50%)]/30',
   literary: 'bg-[hsl(16,85%,60%)]/20 text-[hsl(16,85%,70%)] border-[hsl(16,85%,60%)]/30',
 };

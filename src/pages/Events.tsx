@@ -28,7 +28,7 @@ const Events = () => {
         setEvents(data.map((e: any) => ({
           id: e.id,
           name: e.name,
-          category: e.category as 'cultural' | 'gaming' | 'workshop',
+          category: e.category as 'cultural' | 'sports' | 'workshop',
           day: e.day as 1 | 2 | 3,
           teamSize: e.team_size,
           duration: e.duration || '',

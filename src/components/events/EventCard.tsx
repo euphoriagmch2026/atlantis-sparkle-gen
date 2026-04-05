@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 export interface Event {
   id: string;
   name: string;
-  category: 'cultural' | 'gaming' | 'workshop';
+  category: 'cultural' | 'sports' | 'workshop';
   day: 1 | 2 | 3;
   teamSize: string;
   duration: string;
@@ -25,7 +25,7 @@ interface EventCardProps {
 
 const categoryColors = {
   cultural: 'primary',
-  gaming: 'coral',
+  sports: 'coral',
   workshop: 'mystic',
 } as const;
 

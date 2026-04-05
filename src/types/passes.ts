@@ -16,7 +16,7 @@ export interface PassCartItem extends CartItemBase {
 
 export interface EventCartItem extends CartItemBase {
   type: 'event';
-  category: 'cultural' | 'gaming' | 'workshop';
+  category: 'cultural' | 'sports' | 'workshop';
   day: 1 | 2 | 3;
   teamSize: string;
 }

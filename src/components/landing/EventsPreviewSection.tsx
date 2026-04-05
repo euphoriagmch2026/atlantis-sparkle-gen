@@ -1,4 +1,4 @@
-import { Music, Code, Gamepad2, Palette } from 'lucide-react';
+import { Music, Code, Trophy, Palette } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -20,9 +20,9 @@ const categories: EventCategory[] = [
     color: 'primary',
   },
   {
-    icon: <Gamepad2 className="w-10 h-10" />,
-    title: 'Gaming',
-    description: 'Esports tournaments, casual gaming, and VR experiences.',
+    icon: <Trophy className="w-10 h-10" />,
+    title: 'Sports',
+    description: 'Thrilling sports tournaments, athletics, and team competitions.',
     eventCount: 8,
     color: 'coral',
   },
