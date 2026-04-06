@@ -272,7 +272,7 @@ export const ScheduleSection = () => {
                       <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                         <span>Team: {event.team_size}</span>
                         {event.fee > 0 && <span>₹{event.fee}</span>}
-                        {isSports && <span>Day {event.day}</span>}
+                        
                       </div>
                     </div>
                   </div>
