@@ -28,6 +28,7 @@ export type Database = {
           prize_pool: string | null
           rules: string | null
           team_size: string
+          time: string | null
         }
         Insert: {
           category: string
@@ -42,6 +43,7 @@ export type Database = {
           prize_pool?: string | null
           rules?: string | null
           team_size: string
+          time?: string | null
         }
         Update: {
           category?: string
@@ -56,6 +58,7 @@ export type Database = {
           prize_pool?: string | null
           rules?: string | null
           team_size?: string
+          time?: string | null
         }
         Relationships: []
       }
