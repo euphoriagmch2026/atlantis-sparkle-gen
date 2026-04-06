@@ -239,11 +239,6 @@ export const ScheduleSection = () => {
                     >
                       {event.category}
                     </span>
-                    {isSports && (
-                      <span className="block text-xs text-muted-foreground mt-1">
-                        Day {event.day}
-                      </span>
-                    )}
                   </div>
                   <div
                     className={cn(
