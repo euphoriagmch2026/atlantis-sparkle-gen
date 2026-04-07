@@ -1,47 +1,35 @@
 
 
-# Add Sports Tab & Time Display to Schedule
+# Allow Multiple Basic Registrations
 
-## Database Migration
+## Overview
+Remove the "locked" behavior of the Basic Registration item and allow users to change its quantity via +/- buttons, with a minimum of 1 when events exist in the cart.
 
-Add a `time` text column to the `events` table (nullable, so existing events won't break):
+## Changes
 
-```sql
-ALTER TABLE public.events ADD COLUMN time text;
-```
+### 1. `src/contexts/CartContext.tsx`
+- **Remove the guard** in `updateQuantity` that blocks changes to `BASIC_REGISTRATION_ID`. Instead, enforce a minimum of 1 when event items exist:
+  ```
+  if (itemId === BASIC_REGISTRATION_ID) {
+    const hasEvents = prev.some(i => i.type === 'event');
+    if (hasEvents && quantity < 1) return prev; // enforce min 1
+    if (!hasEvents && quantity < 1) { remove it; return; }
+  }
+  ```
+- The `removeFromCart` guard stays — users still can't fully delete registration via the trash icon; only quantity control is allowed.
+- No new state needed — the existing `quantity` field on the PassCartItem already handles this.
 
-Also update the `user_order_details_view` if it selects from events — but it only joins orders/order_items, so no change needed there.
+### 2. `src/components/passes/CartSummary.tsx`
+- Replace the static Lock icon + price display for the registration item with a quantity selector matching the event items' design:
+  - `−` button (disabled when `regItem.quantity === 1` and events exist), quantity number, `+` button
+  - Show `₹{regItem.price * regItem.quantity}` as the line total
+- Remove the `Lock` icon import (no longer needed).
+- Update the helper text from "Automatically included with events" to "Min. 1 required with events".
 
-## ScheduleSection.tsx Changes
+### 3. `src/pages/Cart.tsx`
+No changes needed — it just renders `<CartSummary />`.
 
-### 1. Update EventRow interface
-Add `time: string | null` field.
-
-### 2. Update Supabase query
-Add `time` to the select list. Change `.order('name')` to `.order('time', { ascending: true, nullsFirst: false })` then `.order('name')` as a tiebreaker.
-
-### 3. Add Sports tab state
-Replace the single `activeDay` index with a `activeTab` state that can be `'sports'` or a day number index. When `activeTab === 'sports'`:
-- Collect ALL events where `category === 'sports'` across all days
-- Sort them by day, then by time
-
-When a Day tab is selected:
-- Filter that day's events to EXCLUDE `category === 'sports'`
-
-### 4. Update tab UI
-After the day buttons, add a "Sports" button styled consistently. Highlight it when `activeTab === 'sports'`. The day theme badge is hidden when Sports tab is active.
-
-### 5. Display time on event cards
-- Import `Clock` icon from `lucide-react`
-- In each event card, if `event.time` exists, render it with a small clock icon above the event name
-- Style: `<div className="flex items-center gap-1 text-xs text-accent mb-1"><Clock className="w-3 h-3" /><span>{event.time}</span></div>`
-
-### 6. Sort helper
-Add a `parseTime` utility that extracts the start time from strings like `"10:00 AM - 11:30 AM"` and converts to minutes for sorting. Events without a time sort to the end.
-
-## Files Changed
-- **Migration**: New SQL file adding `time` column
-- **`src/components/landing/ScheduleSection.tsx`**: All UI and logic changes above
-
-No other files need updating — the Schedule page and other consumers just render `<ScheduleSection />`.
+### Files Modified
+- `src/contexts/CartContext.tsx` — update `updateQuantity` logic
+- `src/components/passes/CartSummary.tsx` — add +/- buttons for registration item
 
