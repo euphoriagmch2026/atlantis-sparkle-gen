@@ -126,8 +126,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateQuantity = useCallback((itemId: string, type: 'pass' | 'event', quantity: number) => {
-    // Prevent quantity change on auto-item
-    if (itemId === BASIC_REGISTRATION_ID) return;
+    if (itemId === BASIC_REGISTRATION_ID) {
+      setCartItems((prev) => {
+        const hasEvents = prev.some((i) => i.type === 'event');
+        if (hasEvents && quantity < 1) return prev;
+        if (!hasEvents && quantity < 1) {
+          return prev.filter((i) => i.id !== BASIC_REGISTRATION_ID);
+        }
+        return prev.map((item) =>
+          item.id === BASIC_REGISTRATION_ID && item.type === 'pass'
+            ? { ...item, quantity }
+            : item
+        );
+      });
+      return;
+    }
 
     if (quantity <= 0) {
       removeFromCart(itemId, type);
