@@ -7,7 +7,6 @@ import {
   Plus,
   Ticket,
   Calendar,
-  Lock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
@@ -101,18 +100,43 @@ export const CartSummary = ({
               </span>
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border/30">
+              <span className="text-sm text-primary font-medium">
+                {regItem.name}
+              </span>
               <div className="flex items-center gap-2">
-                <Lock className="w-3 h-3 text-muted-foreground" />
-                <span className="text-sm text-primary font-medium">
-                  {regItem.name}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    disabled={regItem.quantity <= 1 && eventItems.length > 0}
+                    onClick={() =>
+                      updateQuantity(regItem.id, "pass", regItem.quantity - 1)
+                    }
+                  >
+                    <Minus className="w-3 h-3" />
+                  </Button>
+                  <span className="w-6 text-center text-sm">
+                    {regItem.quantity}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() =>
+                      updateQuantity(regItem.id, "pass", regItem.quantity + 1)
+                    }
+                  >
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  ₹{regItem.price * regItem.quantity}
                 </span>
               </div>
-              <span className="text-sm font-medium text-foreground">
-                ₹{regItem.price}
-              </span>
             </div>
             <p className="text-[10px] text-muted-foreground mt-1 ml-1">
-              Automatically included with events
+              Min. 1 required with events
             </p>
           </div>
         )}
