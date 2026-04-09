@@ -46,15 +46,18 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-    const clientIP = req.headers.get("x-forwarded-for") || "unknown";
-    if (!checkRateLimit(clientIP)) {
-      return new Response(
-        JSON.stringify({ error: "Rate limit exceeded. Try again later." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+  const clientIP = req.headers.get("x-forwarded-for") || "unknown";
+  if (!checkRateLimit(clientIP)) {
+    return new Response(
+      JSON.stringify({ error: "Rate limit exceeded. Try again later." }),
+      {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
 
-    try {
+  try {
     const RAZORPAY_KEY_ID = Deno.env.get("RAZORPAY_KEY_ID");
     const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET");
     if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
@@ -66,8 +69,14 @@ Deno.serve(async (req) => {
     const parsed = OrderRequestSchema.safeParse(body);
     if (!parsed.success) {
       return new Response(
-        JSON.stringify({ error: "Validation failed", details: parsed.error.flatten() }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: "Validation failed",
+          details: parsed.error.flatten(),
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
@@ -76,7 +85,7 @@ Deno.serve(async (req) => {
     // Supabase client with service role for server-side pricing
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     // Extract authenticated user (if any) for user_id
@@ -84,13 +93,17 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
-      const { data: { user } } = await supabase.auth.getUser(token);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser(token);
       if (user) userId = user.id;
     }
 
     // ---- SERVER-SIDE PRICING: Fetch real prices from DB ----
-    const passIds = cartItems.filter(i => i.type === "pass").map(i => i.id);
-    const eventIds = cartItems.filter(i => i.type === "event").map(i => i.id);
+    const passIds = cartItems.filter((i) => i.type === "pass").map((i) => i.id);
+    const eventIds = cartItems
+      .filter((i) => i.type === "event")
+      .map((i) => i.id);
 
     let passesMap: Record<string, { price: number; name: string }> = {};
     let eventsMap: Record<string, { fee: number; name: string }> = {};
@@ -118,19 +131,37 @@ Deno.serve(async (req) => {
     }
 
     // Build line items with server-side prices and calculate total
-    const lineItems: { id: string; type: string; name: string; priceRupees: number; quantity: number }[] = [];
+    const lineItems: {
+      id: string;
+      type: string;
+      name: string;
+      priceRupees: number;
+      quantity: number;
+    }[] = [];
     let totalPaise = 0;
 
     for (const item of cartItems) {
       if (item.type === "pass") {
         const pass = passesMap[item.id];
         if (!pass) throw new Error(`Pass not found: ${item.id}`);
-        lineItems.push({ id: item.id, type: "pass", name: pass.name, priceRupees: pass.price, quantity: item.quantity });
+        lineItems.push({
+          id: item.id,
+          type: "pass",
+          name: pass.name,
+          priceRupees: pass.price,
+          quantity: item.quantity,
+        });
         totalPaise += pass.price * item.quantity * 100;
       } else {
         const ev = eventsMap[item.id];
         if (!ev) throw new Error(`Event not found: ${item.id}`);
-        lineItems.push({ id: item.id, type: "event", name: ev.name, priceRupees: ev.fee, quantity: item.quantity });
+        lineItems.push({
+          id: item.id,
+          type: "event",
+          name: ev.name,
+          priceRupees: ev.fee,
+          quantity: item.quantity,
+        });
         totalPaise += ev.fee * item.quantity * 100;
       }
     }
@@ -148,6 +179,7 @@ Deno.serve(async (req) => {
         amount: totalPaise,
         currency: "INR",
         receipt: `rcpt_${Date.now()}`,
+        payment_capture: 1,
         notes: {
           full_name: userDetails.fullName,
           email: userDetails.email,
@@ -158,7 +190,9 @@ Deno.serve(async (req) => {
 
     if (!razorpayRes.ok) {
       const errBody = await razorpayRes.text();
-      throw new Error(`Razorpay order creation failed [${razorpayRes.status}]: ${errBody}`);
+      throw new Error(
+        `Razorpay order creation failed [${razorpayRes.status}]: ${errBody}`,
+      );
     }
 
     const razorpayOrder = await razorpayRes.json();
@@ -173,7 +207,7 @@ Deno.serve(async (req) => {
         phone: userDetails.phone,
         college: userDetails.college,
         user_id: userId,
-        team_members: userDetails.teamMembers.filter(m => m.length > 0),
+        team_members: userDetails.teamMembers.filter((m) => m.length > 0),
         total_amount: totalPaise,
         status: "created",
       })
@@ -197,7 +231,8 @@ Deno.serve(async (req) => {
       .from("order_items")
       .insert(orderItemsData);
 
-    if (itemsError) throw new Error(`Order items insert failed: ${itemsError.message}`);
+    if (itemsError)
+      throw new Error(`Order items insert failed: ${itemsError.message}`);
 
     return new Response(
       JSON.stringify({
@@ -207,14 +242,14 @@ Deno.serve(async (req) => {
         keyId: RAZORPAY_KEY_ID,
         dbOrderId: order.id,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error: unknown) {
     console.error("Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: message }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
