@@ -12,6 +12,7 @@ export const Footer = () => {
   const quickLinks = [
     { label: "Events", href: "/events" },
     { label: "Schedule", href: "/schedule" },
+    { label: "Pre-Euphoria", href: "/pre-events" },
     { label: "Contact", href: "/contact" },
     { label: "Register", href: "/auth?tab=register" },
   ];

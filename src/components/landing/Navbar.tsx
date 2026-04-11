@@ -19,6 +19,7 @@ const navLinks = [
   { label: "Home", href: "/" },
   { label: "Events", href: "/events" },
   { label: "Schedule", href: "/schedule" },
+  { label: "Pre-Euphoria", href: "/pre-events" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -145,7 +146,7 @@ export const Navbar = () => {
                 <DropdownMenuItem onClick={() => navigate("/profile")}>
                   Profile & Orders
                 </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/events")}>
+                <DropdownMenuItem onClick={() => navigate("/events")}>
                   Browse Events
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/cart")}>

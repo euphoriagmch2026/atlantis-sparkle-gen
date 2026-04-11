@@ -7,6 +7,7 @@ import { CartProvider } from "./contexts/CartContext";
 import ScrollRecovery from "./components/ScrollRecovery";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import PreEvents from "./pages/PreEvents";
 import Contact from "./pages/Contact";
 import Schedule from "./pages/Schedule";
 import Events from "./pages/Events";
@@ -29,6 +30,7 @@ const App = () => (
           <ScrollRecovery />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/pre-events" element={<PreEvents />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/schedule" element={<Schedule />} />
