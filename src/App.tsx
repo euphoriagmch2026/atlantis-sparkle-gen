@@ -27,6 +27,7 @@ import CartPage from "./pages/Cart";
 import Profile from "./pages/Profile";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/pre-events" element={<PreEvents />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/events" element={<Events />} />

@@ -139,20 +139,64 @@ Deno.serve(async (req) => {
           const itemsList = orderData.order_items
             .map(
               (item: any) =>
-                `<li><strong>${item.item_name}</strong> (x${item.quantity})</li>`,
+                `<div style="padding: 10px 0; border-bottom: 1px solid rgba(56, 189, 248, 0.2); display: flex; justify-content: space-between;">
+                   <span style="color: #E2E8F0; font-weight: 600;">${item.item_name}</span>
+                   <span style="color: #94a3b8;">x${item.quantity}</span>
+                 </div>`,
             )
             .join("");
 
           const emailHtml = `
-            <h1>Payment Confirmed!</h1>
-            <p>Dear ${orderData.full_name},</p>
-            <p>Thank you for registering for EUPHORIA 2026!</p>
-            <h3>Order Summary:</h3>
-            <ul>${itemsList}</ul>
-            <p><strong>Total Paid:</strong> ₹${(orderData.total_amount / 100).toFixed(2)}</p>
-            <p>Your Order ID: ${razorpay_order_id}</p>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <style>
+                @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&display=swap');
+                body { margin: 0; padding: 20px; background-color: #020617; color: #E2E8F0; font-family: 'Inter', sans-serif; }
+                .container { max-width: 600px; margin: 0 auto; background: #0f172a; border: 1px solid #1e3a8a; border-radius: 16px; overflow: hidden; box-shadow: 0 0 30px rgba(56, 189, 248, 0.15); }
+                .header { background-image: linear-gradient(to bottom, rgba(2,6,23,0.4), rgba(2,6,23,1)), url('https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?q=80&w=600&auto=format&fit=crop'); background-size: cover; background-position: center; padding: 40px 20px; text-align: center; }
+                .title { font-family: 'Cinzel', serif; font-size: 36px; color: #38bdf8; margin: 0; text-shadow: 0 0 15px rgba(56, 189, 248, 0.6); letter-spacing: 2px; }
+                .subtitle { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 4px; margin-top: 8px; }
+                .body { padding: 40px 30px; }
+                h2 { font-family: 'Cinzel', serif; color: #f8fafc; font-size: 22px; margin-top: 0; text-align: center; }
+                p { font-size: 15px; line-height: 1.6; color: #cbd5e1; }
+                .receipt-box { background: rgba(2, 6, 23, 0.6); border: 1px solid #1e3a8a; border-radius: 12px; padding: 25px; margin: 30px 0; }
+                .total-row { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 2px solid #38bdf8; font-size: 18px; font-weight: bold; color: #00f2fe; }
+                .order-id { text-align: center; font-size: 12px; color: #64748b; margin-top: 30px; font-family: monospace; }
+                .footer { background-color: #020617; padding: 20px; text-align: center; font-size: 12px; color: #475569; border-top: 1px solid #1e3a8a; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1 class="title">EUPHORIA '26</h1>
+                  <div class="subtitle">Payment Confirmed</div>
+                </div>
+                <div class="body">
+                  <h2>Your Passage is Secured.</h2>
+                  <p>Greetings, <strong>${orderData.full_name}</strong>,</p>
+                  <p>The gates of Atlantis recognize your contribution. Your registration for the following events has been officially confirmed.</p>
+                  
+                  <div class="receipt-box">
+                    <h3 style="margin-top: 0; font-family: 'Cinzel', serif; color: #38bdf8; border-bottom: 1px solid #1e3a8a; padding-bottom: 10px;">Order Summary</h3>
+                    ${itemsList}
+                    <div class="total-row">
+                      <span>Total Paid:</span>
+                      <span>₹${(orderData.total_amount / 100).toFixed(2)}</span>
+                    </div>
+                  </div>
+                  
+                  <p style="text-align: center; color: #94a3b8;">Present this receipt or your registered email at the entry gates.</p>
+                  <div class="order-id">Transaction Ref: ${razorpay_order_id}</div>
+                </div>
+                <div class="footer">
+                  EUPHORIA 2026 • The Lost City of Atlantis • GMCH Chandigarh
+                </div>
+              </div>
+            </body>
+            </html>
           `;
-
           // C. Send via Resend API
           await fetch("https://api.resend.com/emails", {
             method: "POST",
