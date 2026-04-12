@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Loader2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { FloatingParticles } from "@/components/landing/FloatingParticles";
 import {
@@ -24,7 +24,7 @@ export default function Checkout() {
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [activeUserData, setActiveUserData] = useState<any>(null);
 
-  // NEW: Timer States (10 minutes = 600 seconds)
+  // Timer States (10 minutes = 600 seconds)
   const [timeLeft, setTimeLeft] = useState<number>(600);
   const [isExpired, setIsExpired] = useState<boolean>(false);
 
@@ -32,7 +32,7 @@ export default function Checkout() {
     if (cartItems.length === 0 && !qrImageUrl) navigate("/events");
   }, [cartItems, navigate, qrImageUrl]);
 
-  // NEW: The 10-Minute Countdown Timer Logic
+  // The 10-Minute Countdown Timer Logic
   useEffect(() => {
     if (!qrImageUrl || isExpired) return;
 
@@ -42,7 +42,6 @@ export default function Checkout() {
           clearInterval(timer);
           setIsExpired(true); // Kill the session
 
-          // Optionally: Silently mark the order as failed in the database
           if (activeOrderId) {
             supabase
               .from("orders")
@@ -61,7 +60,6 @@ export default function Checkout() {
 
   // SUPABASE REALTIME LISTENER
   useEffect(() => {
-    // If we don't have an order, OR if the timer expired, stop listening!
     if (!activeOrderId || isExpired) return;
 
     const channel = supabase
@@ -100,7 +98,6 @@ export default function Checkout() {
     setIsProcessing(true);
     setActiveUserData(data);
 
-    // Reset timer states in case this is a retry
     setIsExpired(false);
     setTimeLeft(600);
 
@@ -128,7 +125,29 @@ export default function Checkout() {
     }
   };
 
-  // Helper to format seconds into MM:SS
+  // NEW: Cancel Payment Handler
+  const handleCancelPayment = async () => {
+    if (activeOrderId) {
+      // 1. Immediately kill the order in the database so the webhook ignores it
+      supabase
+        .from("orders")
+        .update({ status: "cancelled" })
+        .eq("id", activeOrderId)
+        .then();
+    }
+
+    // 2. Reset the UI instantly so the user can edit their form
+    setQrImageUrl(null);
+    setActiveOrderId(null);
+    setIsExpired(false);
+    setTimeLeft(600);
+
+    toast({
+      title: "Payment Cancelled",
+      description: "You can now edit your details or cart.",
+    });
+  };
+
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -146,8 +165,7 @@ export default function Checkout() {
 
         {qrImageUrl ? (
           // QR CODE DISPLAY SCREEN
-          <div className="glass-card max-w-md mx-auto p-8 rounded-xl text-center border-primary/50 relative overflow-hidden">
-            {/* NEW: Expiry Overlay */}
+          <div className="glass-card max-w-md mx-auto p-8 rounded-xl text-center border-primary/50 relative overflow-hidden shadow-2xl">
             {isExpired ? (
               <div className="absolute inset-0 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6">
                 <AlertCircle className="w-16 h-16 text-destructive mb-4" />
@@ -187,7 +205,6 @@ export default function Checkout() {
             </div>
 
             <div className="flex flex-col items-center justify-center gap-3">
-              {/* NEW: The Live Timer */}
               <div
                 className={`flex items-center gap-2 font-mono text-xl font-bold px-4 py-2 rounded-lg border ${timeLeft < 60 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-secondary/50 text-foreground border-border/50"}`}
               >
@@ -203,10 +220,22 @@ export default function Checkout() {
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground mt-6">
+            <p className="text-xs text-muted-foreground mt-6 mb-4">
               Do not refresh this page. It will automatically redirect when
               payment is received.
             </p>
+
+            {/* NEW: Cancel Button */}
+            <div className="pt-4 border-t border-border/50 mt-2">
+              <Button
+                variant="ghost"
+                onClick={handleCancelPayment}
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              >
+                <XCircle className="w-4 h-4 mr-2" />
+                Cancel Payment
+              </Button>
+            </div>
           </div>
         ) : (
           // NORMAL CHECKOUT FORM
