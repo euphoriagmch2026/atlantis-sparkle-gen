@@ -62,45 +62,38 @@ export default function Checkout() {
   useEffect(() => {
     if (!activeOrderId || isExpired) return;
 
-    console.log("Listening for Realtime updates on Order:", activeOrderId);
+    console.log("Poller started for Order:", activeOrderId);
 
-    const channel = supabase
-      .channel("public:orders") // Use the standard table-level channel
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "orders",
-          // We removed the 'filter' here to make it more reliable
-        },
-        (payload) => {
-          console.log("Realtime Update Received:", payload);
+    // Check every 2 seconds if the order is paid
+    const checkPaymentInterval = setInterval(async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("status, razorpay_payment_id")
+        .eq("id", activeOrderId)
+        .single();
 
-          // Manually check if the updated row is OUR order and if it's now 'paid'
-          if (
-            payload.new.id === activeOrderId &&
-            payload.new.status === "paid"
-          ) {
-            console.log("Payment Confirmed! Redirecting...");
-            clearCart();
-            navigate("/order-confirmation", {
-              state: {
-                orderId: activeOrderId,
-                paymentId: payload.new.razorpay_payment_id || "Auto-Verified",
-                userDetails: activeUserData,
-              },
-            });
-          }
-        },
-      )
-      .subscribe((status) => {
-        console.log("Realtime Subscription Status:", status);
-      });
+      if (error) {
+        console.error("Polling error:", error.message);
+        return;
+      }
+
+      if (data && data.status === "paid") {
+        console.log("✅ Payment detected via Polling! Redirecting...");
+        clearInterval(checkPaymentInterval); // Stop polling
+        clearCart();
+        navigate("/order-confirmation", {
+          state: {
+            orderId: activeOrderId,
+            paymentId: data.razorpay_payment_id || "Auto-Verified",
+            userDetails: activeUserData,
+          },
+        });
+      }
+    }, 2000); // 2-second interval for fast response
 
     return () => {
-      console.log("Cleaning up Realtime listener...");
-      supabase.removeChannel(channel);
+      console.log("Stopping Poller...");
+      clearInterval(checkPaymentInterval);
     };
   }, [activeOrderId, isExpired, navigate, clearCart, activeUserData]);
 
