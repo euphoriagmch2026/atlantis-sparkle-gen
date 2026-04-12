@@ -38,13 +38,19 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-    const clientIP = req.headers.get("x-forwarded-for") || "unknown";
-    if (!checkRateLimit(clientIP)) {
-      return new Response(
-        JSON.stringify({ verified: false, error: "Rate limit exceeded. Try again later." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+  const clientIP = req.headers.get("x-forwarded-for") || "unknown";
+  if (!checkRateLimit(clientIP)) {
+    return new Response(
+      JSON.stringify({
+        verified: false,
+        error: "Rate limit exceeded. Try again later.",
+      }),
+      {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
 
   try {
     const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET");
@@ -155,7 +161,7 @@ Deno.serve(async (req) => {
               Authorization: `Bearer ${RESEND_API_KEY}`,
             },
             body: JSON.stringify({
-              from: "Euphoria Team <onboarding@resend.dev>", // Or your verified domain
+              from: "Euphoria 2026 <orders@euphoria2026.com>", // UPDATE THIS LINE
               to: [orderData.email],
               subject: "Order Confirmation - EUPHORIA 2026",
               html: emailHtml,
