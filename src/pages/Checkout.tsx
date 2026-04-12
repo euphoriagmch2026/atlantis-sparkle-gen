@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Loader2, Clock, AlertCircle, XCircle } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { FloatingParticles } from "@/components/landing/FloatingParticles";
@@ -19,12 +20,10 @@ export default function Checkout() {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // QR & Order States
   const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [activeUserData, setActiveUserData] = useState<any>(null);
 
-  // Timer States (10 minutes = 600 seconds)
   const [timeLeft, setTimeLeft] = useState<number>(600);
   const [isExpired, setIsExpired] = useState<boolean>(false);
 
@@ -32,7 +31,6 @@ export default function Checkout() {
     if (cartItems.length === 0 && !qrImageUrl) navigate("/events");
   }, [cartItems, navigate, qrImageUrl]);
 
-  // The 10-Minute Countdown Timer Logic
   useEffect(() => {
     if (!qrImageUrl || isExpired) return;
 
@@ -40,7 +38,7 @@ export default function Checkout() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          setIsExpired(true); // Kill the session
+          setIsExpired(true);
 
           if (activeOrderId) {
             supabase
@@ -58,13 +56,9 @@ export default function Checkout() {
     return () => clearInterval(timer);
   }, [qrImageUrl, isExpired, activeOrderId]);
 
-  // SUPABASE REALTIME LISTENER
   useEffect(() => {
     if (!activeOrderId || isExpired) return;
 
-    console.log("Poller started for Order:", activeOrderId);
-
-    // Check every 2 seconds if the order is paid
     const checkPaymentInterval = setInterval(async () => {
       const { data, error } = await supabase
         .from("orders")
@@ -72,14 +66,10 @@ export default function Checkout() {
         .eq("id", activeOrderId)
         .single();
 
-      if (error) {
-        console.error("Polling error:", error.message);
-        return;
-      }
+      if (error) return;
 
       if (data && data.status === "paid") {
-        console.log("✅ Payment detected via Polling! Redirecting...");
-        clearInterval(checkPaymentInterval); // Stop polling
+        clearInterval(checkPaymentInterval);
         clearCart();
         navigate("/order-confirmation", {
           state: {
@@ -89,12 +79,9 @@ export default function Checkout() {
           },
         });
       }
-    }, 2000); // 2-second interval for fast response
+    }, 2000);
 
-    return () => {
-      console.log("Stopping Poller...");
-      clearInterval(checkPaymentInterval);
-    };
+    return () => clearInterval(checkPaymentInterval);
   }, [activeOrderId, isExpired, navigate, clearCart, activeUserData]);
 
   const handleSubmit = async (
@@ -102,16 +89,13 @@ export default function Checkout() {
   ) => {
     setIsProcessing(true);
     setActiveUserData(data);
-
     setIsExpired(false);
     setTimeLeft(600);
 
     try {
       const { data: responseData, error } = await supabase.functions.invoke(
         "generate-qr",
-        {
-          body: { checkoutData: data, cartItems, totalAmount },
-        },
+        { body: { checkoutData: data, cartItems, totalAmount } },
       );
 
       if (error || responseData.error)
@@ -130,18 +114,14 @@ export default function Checkout() {
     }
   };
 
-  // NEW: Cancel Payment Handler
   const handleCancelPayment = async () => {
     if (activeOrderId) {
-      // 1. Immediately kill the order in the database so the webhook ignores it
       supabase
         .from("orders")
         .update({ status: "cancelled" })
         .eq("id", activeOrderId)
         .then();
     }
-
-    // 2. Reset the UI instantly so the user can edit their form
     setQrImageUrl(null);
     setActiveOrderId(null);
     setIsExpired(false);
@@ -161,6 +141,14 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <Helmet>
+        <title>Checkout | EUPHORIA 2026</title>
+        <meta
+          name="description"
+          content="Securely pay for your EUPHORIA 2026 event registrations."
+        />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <FloatingParticles />
       <Navbar />
       <main className="relative pt-24 pb-20 px-4 max-w-6xl mx-auto">
@@ -169,7 +157,6 @@ export default function Checkout() {
         </Button>
 
         {qrImageUrl ? (
-          // QR CODE DISPLAY SCREEN
           <div className="glass-card max-w-md mx-auto p-8 rounded-xl text-center border-primary/50 relative overflow-hidden shadow-2xl">
             {isExpired ? (
               <div className="absolute inset-0 bg-background/95 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6">
@@ -216,7 +203,6 @@ export default function Checkout() {
                 <Clock className="w-5 h-5" />
                 {formatTime(timeLeft)}
               </div>
-
               <div className="flex items-center justify-center gap-2 text-accent text-sm">
                 <Loader2 className="animate-spin w-4 h-4" />
                 <p className="font-semibold animate-pulse">
@@ -230,20 +216,17 @@ export default function Checkout() {
               payment is received.
             </p>
 
-            {/* NEW: Cancel Button */}
             <div className="pt-4 border-t border-border/50 mt-2">
               <Button
                 variant="ghost"
                 onClick={handleCancelPayment}
                 className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               >
-                <XCircle className="w-4 h-4 mr-2" />
-                Cancel Payment
+                <XCircle className="w-4 h-4 mr-2" /> Cancel Payment
               </Button>
             </div>
           </div>
         ) : (
-          // NORMAL CHECKOUT FORM
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             <div className="lg:col-span-3">
               <CheckoutForm

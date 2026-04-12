@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Navbar } from "@/components/landing/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +16,7 @@ export default function Admin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === "euphoria2026") {
-      // <-- YOUR PASSWORD
+    if (passcode === "Rtx@2026ti#") {
       setIsAuthenticated(true);
       fetchPending();
     } else toast({ title: "Access Denied", variant: "destructive" });
@@ -32,8 +32,6 @@ export default function Admin() {
 
   const verifyOrder = async (orderId: string) => {
     setProcessingId(orderId);
-
-    // Call our new Edge Function!
     const { error } = await supabase.functions.invoke("approve-order", {
       body: { orderId },
     });
@@ -54,6 +52,10 @@ export default function Admin() {
   if (!isAuthenticated)
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
+        <Helmet>
+          <title>Admin Login | EUPHORIA 2026</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <form onSubmit={handleLogin} className="glass-card p-8 rounded-xl">
           <Input
             type="password"
@@ -62,13 +64,17 @@ export default function Admin() {
             placeholder="Passcode"
             className="mb-4"
           />
-          <Button w-full>Login</Button>
+          <Button className="w-full">Login</Button>
         </form>
       </div>
     );
 
   return (
     <div className="min-h-screen bg-background pt-32 px-4 max-w-5xl mx-auto">
+      <Helmet>
+        <title>Admin Dashboard | EUPHORIA 2026</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <Navbar />
       <h1 className="text-3xl font-bold mb-8">Pending Verifications</h1>
       <div className="grid gap-4 md:grid-cols-2">

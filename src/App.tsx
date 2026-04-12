@@ -11,6 +11,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { HelmetProvider } from "react-helmet-async"; // NEW
 import { CartProvider } from "./contexts/CartContext";
 import ScrollRecovery from "./components/ScrollRecovery";
 
@@ -31,7 +32,6 @@ import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
-// --- NEW COMPONENT: Handles the email verification redirect ---
 const AuthStateHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,48 +40,49 @@ const AuthStateHandler = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
-      // If the user just signed in and the URL has an access token (like from a verification email)
       if (event === "SIGNED_IN" && location.hash.includes("access_token")) {
-        // Remove the ugly hash and redirect to the profile page
         navigate("/profile", { replace: true });
       }
     });
-
     return () => subscription.unsubscribe();
   }, [navigate, location]);
 
-  return null; // This is a logic-only component, it renders nothing visible
+  return null;
 };
-// --------------------------------------------------------------
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <CartProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthStateHandler /> {/* Inject the handler here */}
-          <ScrollRecovery />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/pre-events" element={<PreEvents />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/events/:eventId" element={<EventDetails />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/order-confirmation" element={<OrderConfirmation />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </CartProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <CartProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthStateHandler />
+            <ScrollRecovery />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/pre-events" element={<PreEvents />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/events/:eventId" element={<EventDetails />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route
+                path="/order-confirmation"
+                element={<OrderConfirmation />}
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

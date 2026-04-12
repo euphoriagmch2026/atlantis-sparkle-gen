@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Package, Calendar, User as UserIcon } from "lucide-react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
@@ -18,7 +19,6 @@ interface OrderItem {
   price: number;
   quantity: number;
 }
-
 interface Order {
   id: string;
   razorpay_order_id: string | null;
@@ -30,7 +30,6 @@ interface Order {
   created_at: string;
   order_items: OrderItem[];
 }
-
 interface Profile {
   full_name: string | null;
   phone: string | null;
@@ -61,7 +60,9 @@ const Profile = () => {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/auth");
         return;
@@ -69,8 +70,16 @@ const Profile = () => {
       setUser(user);
 
       const [profileRes, ordersRes] = await Promise.all([
-        supabase.from("profiles").select("full_name, phone, college, avatar_url").eq("id", user.id).single(),
-        supabase.from("orders").select("*, order_items(*)").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase
+          .from("profiles")
+          .select("full_name, phone, college, avatar_url")
+          .eq("id", user.id)
+          .single(),
+        supabase
+          .from("orders")
+          .select("*, order_items(*)")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -89,7 +98,6 @@ const Profile = () => {
           <div className="max-w-4xl mx-auto space-y-6">
             <Skeleton className="h-48 w-full rounded-xl" />
             <Skeleton className="h-32 w-full rounded-xl" />
-            <Skeleton className="h-32 w-full rounded-xl" />
           </div>
         </main>
       </div>
@@ -98,17 +106,26 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
+      <Helmet>
+        <title>Your Profile | EUPHORIA 2026</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <FloatingParticles />
       <Navbar />
       <main className="relative pt-24 md:pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-6 text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
 
-          <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-8 text-glow">Profile & Orders</h1>
+          <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-foreground mb-8 text-glow">
+            Profile & Orders
+          </h1>
 
-          {/* Profile Card */}
           <Card className="glass-card border-border/30 mb-10">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground">
@@ -119,25 +136,32 @@ const Profile = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="text-muted-foreground">Name</p>
-                  <p className="text-foreground font-medium">{profile?.full_name || "—"}</p>
+                  <p className="text-foreground font-medium">
+                    {profile?.full_name || "—"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Email</p>
-                  <p className="text-foreground font-medium">{user?.email || "—"}</p>
+                  <p className="text-foreground font-medium">
+                    {user?.email || "—"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Phone</p>
-                  <p className="text-foreground font-medium">{profile?.phone || "—"}</p>
+                  <p className="text-foreground font-medium">
+                    {profile?.phone || "—"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">College</p>
-                  <p className="text-foreground font-medium">{profile?.college || "—"}</p>
+                  <p className="text-foreground font-medium">
+                    {profile?.college || "—"}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Order History */}
           <h2 className="font-cinzel text-xl md:text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
             <Package className="w-5 h-5 text-primary" /> Order History
           </h2>
@@ -145,8 +169,12 @@ const Profile = () => {
           {orders.length === 0 ? (
             <Card className="glass-card border-border/30">
               <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No orders yet. Start exploring events!</p>
-                <Button className="mt-4" onClick={() => navigate("/events")}>Browse Events</Button>
+                <p className="text-muted-foreground">
+                  No orders yet. Start exploring events!
+                </p>
+                <Button className="mt-4" onClick={() => navigate("/events")}>
+                  Browse Events
+                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -155,42 +183,60 @@ const Profile = () => {
                 <Card
                   key={order.id}
                   className="glass-card border-border/30 cursor-pointer hover:border-primary/30 transition-colors"
-                  onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                  onClick={() =>
+                    setExpandedOrder(
+                      expandedOrder === order.id ? null : order.id,
+                    )
+                  }
                 >
                   <CardContent className="py-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
                         <span className="text-sm text-muted-foreground">
-                          {new Date(order.created_at).toLocaleDateString("en-IN", {
-                            day: "numeric", month: "short", year: "numeric",
-                          })}
+                          {new Date(order.created_at).toLocaleDateString(
+                            "en-IN",
+                            { day: "numeric", month: "short", year: "numeric" },
+                          )}
                         </span>
-                        <Badge variant="outline" className={statusColor(order.status)}>
+                        <Badge
+                          variant="outline"
+                          className={statusColor(order.status)}
+                        >
                           {order.status}
                         </Badge>
                       </div>
-                      <p className="text-foreground font-semibold">₹{(order.total_amount / 100).toFixed(2)}</p>
+                      <p className="text-foreground font-semibold">
+                        ₹{(order.total_amount / 100).toFixed(2)}
+                      </p>
                     </div>
-
                     {order.razorpay_order_id && (
                       <p className="text-xs text-muted-foreground font-mono mb-2">
                         Order: {order.razorpay_order_id}
                       </p>
                     )}
-
-                    {expandedOrder === order.id && order.order_items.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-border/30 space-y-2">
-                        {order.order_items.map((item) => (
-                          <div key={item.id} className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">
-                              {item.item_name} {item.quantity > 1 ? `×${item.quantity}` : ""}
-                            </span>
-                            <span className="text-foreground">₹{((item.price * item.quantity) / 100).toFixed(2)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {expandedOrder === order.id &&
+                      order.order_items.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-border/30 space-y-2">
+                          {order.order_items.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex justify-between text-sm"
+                            >
+                              <span className="text-muted-foreground">
+                                {item.item_name}{" "}
+                                {item.quantity > 1 ? `×${item.quantity}` : ""}
+                              </span>
+                              <span className="text-foreground">
+                                ₹
+                                {((item.price * item.quantity) / 100).toFixed(
+                                  2,
+                                )}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                   </CardContent>
                 </Card>
               ))}

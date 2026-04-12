@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { CartSummary } from "@/components/passes/CartSummary";
@@ -12,6 +13,14 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
+      <Helmet>
+        <title>Your Cart | EUPHORIA 2026</title>
+        <meta
+          name="description"
+          content="Review your selected events and passes for EUPHORIA 2026."
+        />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <Navbar />
       <main className="flex-grow pt-28 pb-20 px-4">
         <div className="max-w-3xl mx-auto w-full">
@@ -36,7 +45,6 @@ export default function CartPage() {
             </h5>
           </div>
 
-          {/* Direct render prevents drawer scroll-lock bugs */}
           <CartSummary className="border-border/50 bg-secondary/10 shadow-2xl" />
         </div>
       </main>
