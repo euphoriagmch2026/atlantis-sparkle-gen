@@ -62,18 +62,27 @@ export default function Checkout() {
   useEffect(() => {
     if (!activeOrderId || isExpired) return;
 
+    console.log("Listening for Realtime updates on Order:", activeOrderId);
+
     const channel = supabase
-      .channel("custom-payment-channel")
+      .channel("public:orders") // Use the standard table-level channel
       .on(
         "postgres_changes",
         {
           event: "UPDATE",
           schema: "public",
           table: "orders",
-          filter: `id=eq.${activeOrderId}`,
+          // We removed the 'filter' here to make it more reliable
         },
         (payload) => {
-          if (payload.new.status === "paid") {
+          console.log("Realtime Update Received:", payload);
+
+          // Manually check if the updated row is OUR order and if it's now 'paid'
+          if (
+            payload.new.id === activeOrderId &&
+            payload.new.status === "paid"
+          ) {
+            console.log("Payment Confirmed! Redirecting...");
             clearCart();
             navigate("/order-confirmation", {
               state: {
@@ -85,9 +94,12 @@ export default function Checkout() {
           }
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Realtime Subscription Status:", status);
+      });
 
     return () => {
+      console.log("Cleaning up Realtime listener...");
       supabase.removeChannel(channel);
     };
   }, [activeOrderId, isExpired, navigate, clearCart, activeUserData]);
