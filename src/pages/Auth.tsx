@@ -5,104 +5,128 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
-export default function Admin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passcode, setPasscode] = useState("");
-  const [orders, setOrders] = useState<any[]>([]);
-  const [processingId, setProcessingId] = useState<string | null>(null);
+export default function Auth() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [isSignUp, setIsSignUp] = useState(searchParams.get("tab") === "register");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Sync state if URL changes (e.g. clicking Register from Hero section)
+  useEffect(() => {
+    setIsSignUp(searchParams.get("tab") === "register");
+  }, [searchParams]);
+
+  const toggleAuthMode = () => {
+    const newIsSignUp = !isSignUp;
+    setIsSignUp(newIsSignUp);
+    setSearchParams(newIsSignUp ? { tab: "register" } : {});
+  };
+
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passcode === "euphoria2026") {
-      setIsAuthenticated(true);
-      fetchPending();
-    } else toast({ title: "Access Denied", variant: "destructive" });
-  };
+    setIsLoading(true);
 
-  const fetchPending = async () => {
-    const { data } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("status", "pending");
-    if (data) setOrders(data);
-  };
-
-  const verifyOrder = async (orderId: string) => {
-    setProcessingId(orderId);
-    const { error } = await supabase.functions.invoke("approve-order", {
-      body: { orderId },
-    });
-
-    if (error) {
-      toast({
-        title: "Failed",
-        description: error.message,
-        variant: "destructive",
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast({ 
+          title: "Registration successful!", 
+          description: "Please check your email to verify your account." 
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast({ 
+          title: "Welcome back!", 
+          description: "You have successfully logged in." 
+        });
+        navigate("/profile"); // Redirect to profile after successful login
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "Authentication Failed", 
+        description: error.message, 
+        variant: "destructive" 
       });
-    } else {
-      toast({ title: "Success", description: "Email sent!" });
-      setOrders(orders.filter((o) => o.id !== orderId));
+    } finally {
+      setIsLoading(false);
     }
-    setProcessingId(null);
   };
-
-  if (!isAuthenticated)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Helmet>
-          <title>Admin Login | EUPHORIA 2026</title>
-          <meta name="robots" content="noindex, nofollow" />
-        </Helmet>
-        <form onSubmit={handleLogin} className="glass-card p-8 rounded-xl">
-          <Input
-            type="password"
-            value={passcode}
-            onChange={(e) => setPasscode(e.target.value)}
-            placeholder="Passcode"
-            className="mb-4"
-          />
-          <Button className="w-full">Login</Button>
-        </form>
-      </div>
-    );
 
   return (
-    <div className="min-h-screen bg-background pt-32 px-4 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-background flex flex-col items-center">
       <Helmet>
-        <title>Admin Dashboard | EUPHORIA 2026</title>
-        <meta name="robots" content="noindex, nofollow" />
+        <title>{isSignUp ? "Register" : "Sign In"} | EUPHORIA 2026</title>
       </Helmet>
+      
       <Navbar />
-      <h1 className="text-3xl font-bold mb-8">Pending Verifications</h1>
-      <div className="grid gap-4 md:grid-cols-2">
-        {orders.map((order) => (
-          <div
-            key={order.id}
-            className="glass-card p-6 rounded-xl border border-primary/20"
-          >
-            <h3 className="font-bold text-lg">{order.full_name}</h3>
-            <p className="text-accent text-xl font-bold my-2">
-              ₹{order.total_amount / 100}
-            </p>
-            <div className="bg-secondary/50 p-2 rounded mb-4 font-mono text-lg text-center">
-              {order.razorpay_payment_id?.replace("UTR_", "")}
+
+      <div className="flex-1 w-full flex items-center justify-center p-4 mt-20">
+        <div className="w-full max-w-md glass-card p-8 rounded-xl border border-primary/20">
+          <h1 className="text-3xl font-bold mb-6 text-center text-glow font-cinzel">
+            {isSignUp ? "Join Atlantis" : "Welcome Back"}
+          </h1>
+
+          <form onSubmit={handleAuth} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1 text-muted-foreground">Email</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="bg-secondary/50"
+              />
             </div>
-            <Button
-              onClick={() => verifyOrder(order.id)}
-              disabled={processingId === order.id}
-              className="w-full bg-green-600 hover:bg-green-700"
+            <div>
+              <label className="block text-sm font-medium mb-1 text-muted-foreground">Password</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="bg-secondary/50"
+              />
+            </div>
+
+            <Button 
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold tracking-wide transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--primary)/0.5)]" 
+              disabled={isLoading}
             >
-              {processingId === order.id ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Verify & Send Ticket"
-              )}
+              {isLoading ? <Loader2 className="animate-spin mr-2 w-4 h-4" /> : null}
+              {isSignUp ? "Register" : "Sign In"}
             </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            <button
+              type="button"
+              onClick={toggleAuthMode}
+              className="text-primary hover:text-primary/80 hover:underline font-medium transition-colors"
+            >
+              {isSignUp ? "Sign In" : "Register"}
+            </button>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
