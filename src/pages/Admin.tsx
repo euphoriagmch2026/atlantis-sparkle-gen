@@ -85,14 +85,21 @@ export default function Admin() {
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {orders.map((order) => {
-          // Calculate how many Basic Registrations were bought in this specific order
+          // PROOFED: Rely on item_type === 'pass' strictly set by your DB check constraints, with safe fallback.
           const basicRegCount = order.order_items?.reduce((total: number, item: any) => {
-            const name = item.item_name.toLowerCase();
-            if (name.includes("basic") || name.includes("registration")) {
+            if (item.item_type === 'pass') {
+              return total + item.quantity;
+            }
+            // Fallback just in case older legacy rows are missing item_type
+            const name = (item.item_name || "").toLowerCase();
+            if (!item.item_type && (name.includes("basic") || name.includes("registration") || name.includes("pass"))) {
               return total + item.quantity;
             }
             return total;
           }, 0) || 0;
+
+          // PROOFED: Filter out passes so ONLY valid events are mapped in the UI below
+          const purchasedEvents = order.order_items?.filter((item: any) => item.item_type === 'event') || [];
 
           return (
             <div
@@ -127,11 +134,11 @@ export default function Admin() {
               {/* Order Items (Events) */}
               <div className="mb-4 flex-grow space-y-2 border-y border-border/30 py-4">
                 <p className="text-sm font-semibold text-foreground mb-2">Events Purchased:</p>
-                {order.order_items && order.order_items.length > 0 ? (
-                  order.order_items.map((item: any) => (
+                {purchasedEvents.length > 0 ? (
+                  purchasedEvents.map((item: any) => (
                     <div key={item.id} className="flex justify-between text-sm items-center gap-2">
                       <span className="text-muted-foreground leading-tight">
-                        • {item.item_name} {item.quantity > 1 && <span className="text-primary font-bold">(x{item.quantity})</span>}
+                        • {item.item_name || "Unknown Event"} {item.quantity > 1 && <span className="text-primary font-bold">(x{item.quantity})</span>}
                       </span>
                       <span className="text-foreground shrink-0 font-mono">₹{((item.price * item.quantity) / 100).toFixed(0)}</span>
                     </div>
