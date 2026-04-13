@@ -14,6 +14,11 @@ export default function Auth() {
   const { toast } = useToast();
 
   const [isSignUp, setIsSignUp] = useState(searchParams.get("tab") === "register");
+  
+  // Registration fields
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [college, setCollege] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +43,13 @@ export default function Auth() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: fullName,
+              phone: phone,
+              college: college,
+            }
+          }
         });
         if (error) throw error;
         toast({ 
@@ -82,6 +94,45 @@ export default function Auth() {
           </h1>
 
           <form onSubmit={handleAuth} className="space-y-4">
+            {isSignUp && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-muted-foreground">Full Name</label>
+                  <Input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="John Doe"
+                    required={isSignUp}
+                    className="bg-secondary/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-muted-foreground">Phone Number</label>
+                  <Input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="10-digit number"
+                    pattern="[0-9]{10}"
+                    required={isSignUp}
+                    className="bg-secondary/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-muted-foreground">College</label>
+                  <Input
+                    type="text"
+                    value={college}
+                    onChange={(e) => setCollege(e.target.value)}
+                    placeholder="Your College Name"
+                    required={isSignUp}
+                    className="bg-secondary/50"
+                  />
+                </div>
+              </>
+            )}
+
             <div>
               <label className="block text-sm font-medium mb-1 text-muted-foreground">Email</label>
               <Input
